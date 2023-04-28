@@ -46,6 +46,7 @@ struct Game {
     process: Process,
     module: u64,
     start: Watcher<u8>,
+    loading: Watcher<u8>,
     splits: HashSet<String>,
 }
 
@@ -55,6 +56,7 @@ impl Game {
             process,
             module,
             start: Watcher::new(vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]), // CurrentGameChapterID
+            loading: Watcher::new(vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA]), // CurrentGameChapterID
             splits: HashSet::new(),
         };
         Some(game)
@@ -67,6 +69,7 @@ impl Game {
     fn update_vars(&mut self) -> Option<Vars<'_>> {
         Some(Vars {
             start: self.start.update(&self.process, self.module)?,
+            loading: self.loading.update(&self.process, self.module)?,
             splits: &mut self.splits,
         })
     }
@@ -75,6 +78,7 @@ impl Game {
 #[allow(unused)]
 pub struct Vars<'a> {
     start: &'a Pair<u8>,
+    loading: &'a Pair<u8>,
     splits: &'a mut HashSet<String>,
 }
 
@@ -162,15 +166,13 @@ pub extern "C" fn update() {
 
                     if settings.load_removal {
                         // load/save removal
-                        // if vars.loading.current == 0 && vars.saving.old > vars.saving.current {
-                        //     timer::resume_game_time()
-                        // }
+                        if vars.loading.old == 0 && vars.loading.current == 1 {
+                            timer::resume_game_time()
+                        }
 
-                        // if (vars.loading.old == 0 && vars.loading.current != 0)
-                        //     || (vars.saving.current != 0 && vars.saving.old < vars.saving.current)
-                        // {
-                        //     timer::pause_game_time()
-                        // }
+                        if vars.loading.old == 1 && vars.loading.current == 0 {
+                            timer::pause_game_time()
+                        }
                     }
                 }
                 _ => {}
