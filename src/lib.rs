@@ -45,6 +45,7 @@ impl<T: Pod> Watcher<T> {
 struct Game {
     process: Process,
     module: u64,
+    start: Watcher<u8>,
     splits: HashSet<String>,
 }
 
@@ -53,7 +54,7 @@ impl Game {
         let game = Self {
             process,
             module,
-
+            start: Watcher::new(vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]), // CurrentGameChapterID
             splits: HashSet::new(),
         };
         Some(game)
@@ -65,28 +66,15 @@ impl Game {
 
     fn update_vars(&mut self) -> Option<Vars<'_>> {
         Some(Vars {
+            start: self.start.update(&self.process, self.module)?,
             splits: &mut self.splits,
         })
     }
 }
 
-// This enum maps to the SavePlayerCharacterData
-// #[derive(Default, PartialEq)]
-// pub enum Character {
-//     #[default]
-//     NoCharacter = -1,
-// }
-
-// impl Display for Character {
-//     fn fmt(&self, f: &mut Formatter) -> Result {
-//         match self {
-//             Character::NoCharacter => write!(f, "none"),
-//         }
-//     }
-// }
-
 #[allow(unused)]
 pub struct Vars<'a> {
+    start: &'a Pair<u8>,
     splits: &'a mut HashSet<String>,
 }
 
@@ -120,9 +108,9 @@ pub extern "C" fn update() {
     let settings = state.settings.clone().unwrap();
 
     if state.game.is_none() {
-        match Process::attach("LIVEALIVE_Demo") {
+        match Process::attach("LIVEALIVE") {
             Some(process) => {
-                match process.get_module_address("LIVEALIVE_Demo-Win64-Shipping.exe") {
+                match process.get_module_address("LIVEALIVE-Win64-Shipping.exe") {
                     Ok(Address(module)) => {
                         asr::print_message("attached to process");
 
@@ -135,22 +123,22 @@ pub extern "C" fn update() {
         }
     }
 
-    // Linux
-    // if state.game.is_none() {
-    //     match Process::attach("LIVEALIVE_Demo") {
-    //         Some(process) => {
-    //             match process.get_module_address("LIVEALIVE_Demo-Win64-Shipping.exe") {
-    //                 Ok(Address(module)) => {
-    //                     asr::print_message("attached to process");
+    // linux 
+    if state.game.is_none() {
+        match Process::attach("LIVEALIVE") {
+            Some(process) => {
+                match process.get_module_address("LIVEALIVE-Win64-Shipping.exe") {
+                    Ok(Address(module)) => {
+                        asr::print_message("attached to process");
 
-    //                     state.game = Game::new(process, module)
-    //                 }
-    //                 _ => (),
-    //             };
-    //         }
-    //         None => (),
-    //     }
-    // }
+                        state.game = Game::new(process, module)
+                    }
+                    _ => (),
+                };
+            }
+            None => (),
+        }
+    }
 
     if let Some(game) = &mut state.game {
         if !game.process.is_open() {
@@ -161,15 +149,28 @@ pub extern "C" fn update() {
         if let Some(mut vars) = game.update_vars() {
             match timer::state() {
                 TimerState::NotRunning => {
-                    // if settings.start {
-                    //     game.reset_splits();
-                    //     timer::start();
-                    // }
+                    if settings.start && vars.start.old == 9 && vars.start.current != 9 {
+                        game.reset_splits();
+                        timer::start();
+                    }
                 }
                 TimerState::Running => {
                     if let Some(reason) = should_split(&mut vars, &settings) {
                         asr::print_message(&reason);
                         timer::split();
+                    }
+
+                    if settings.load_removal {
+                        // load/save removal
+                        // if vars.loading.current == 0 && vars.saving.old > vars.saving.current {
+                        //     timer::resume_game_time()
+                        // }
+
+                        // if (vars.loading.old == 0 && vars.loading.current != 0)
+                        //     || (vars.saving.current != 0 && vars.saving.old < vars.saving.current)
+                        // {
+                        //     timer::pause_game_time()
+                        // }
                     }
                 }
                 _ => {}
