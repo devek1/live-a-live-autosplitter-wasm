@@ -16,13 +16,32 @@ A multiplatform autosplitter for Live a Live (PC)
 
 ## Install
 
-Since this autosplitter is in prerelease, you'll need to download the following file and add an "Auto Splitting Runtime" to your layout and add this file. WASM files should be fully supported in a future version of livesplit.
+Go to "Edit Splits", and make sure Live a Live (2022) is selected as the game name, and click "Activate" then click "Settings" to change your splits.
 
-### Windows
+To install a new version, restart LiveSplit
 
-https://github.com/Eein/live-a-live-autosplitter-wasm/releases/latest/download/live_a_live_autosplitter_wasm.wasm
+## Manual Install
+
+Go to release page and select a release and add Auto Splitting Runtime component and add the file manually.
+
+### For Any% Good Ending Runs
+
+Select Automatic Start on New Game
+
+Select "Start {Chapter name}" for all spits *except* the first characters split, unless you have a "menu split" before that character select.
+
+Note: In the future, preconfigured autosplitter and splits file may be provided in the community discord/src page.
+
+Ending split must be done manually for now.
+
+### For Individual Level Runs
+
+Select Automatic Start on character select
+
+Ending split must be done manually for now.
 
 ## build
+
 1. install rustup + stable rust https://rustup.rs/
 2. install wasm target
   - `rustup target add wasm32-unknown-unknown`
