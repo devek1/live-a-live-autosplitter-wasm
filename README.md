@@ -4,10 +4,11 @@ A multiplatform autosplitter for Live a Live (PC)
 
 ## Supported Features
 - Auto start timer on character select
-- Game Time through loading removal
+- Auto start timer when selecting NEW GAME
+- Game Time through loading removal (not accurate)
+- Split on next chapter start (only when timer is running)
 
 # TODO:
-
 - [ ] Character Story Splits (will look more into this at a later time)
 - [ ] Full game ending splits
     - [ ] final boss end flash (this is going to be a nightmare)

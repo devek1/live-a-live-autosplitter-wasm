@@ -1,190 +1,135 @@
-// #![no_std]
-use spinning_top::{const_spinlock, Spinlock};
-use std::collections::HashSet;
-use std::fmt::{Display, Formatter, Result};
+use asr::{
+    future::next_tick,
+    timer::{self, TimerState},
+    watcher::Watcher,
+    Process,
+};
 mod settings;
 use settings::Settings;
+use std::collections::HashSet;
 
-use bytemuck::Pod;
+asr::async_main!(stable);
 
-use asr::{
-    timer::{self, TimerState},
-    watcher::Pair,
-    Address, Process,
-};
+async fn main() {
+    // TODO: Set up some general state and settings.
+    let process = Process::wait_attach("LIVEALIVE-Win64-Shipping.exe").await;
 
-static STATE: Spinlock<State> = const_spinlock(State {
-    game: None,
-    settings: None,
-});
+    // let mut start = Watcher::<u8>::new(vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]); // CurrentGameChapterID
+    // let mut loading = Watcher::<u8>::new(vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA]); // CurrentGameChapterID
+    let mut start_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
+    let mut new_game_start_watcher = Watcher::<u8>::new(); // Start Trigger for New Game
+    let mut loading_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
+    let mut splits = HashSet::<String>::new();
+    let settings = Settings::register();
+    let (main_module_base, _main_module_size) = process
+        .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
+        .await;
 
-pub struct State {
-    game: Option<Game>,
-    settings: Option<Settings>,
-}
+    process
+        .until_closes(async {
+            // TODO: Load some initial information from the process.
+            loop {
+                let start = start_watcher
+                    .update(
+                        process
+                            .read_pointer_path64(
+                                main_module_base,
+                                &vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28],
+                            )
+                            .ok(),
+                    )
+                    .unwrap();
 
-struct Watcher<T> {
-    watcher: asr::watcher::Watcher<T>,
-    address: Vec<u64>,
-}
+                let new_start_value = match process.read_pointer_path64(
+                    main_module_base,
+                    &vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348],
+                ) {
+                    Ok(val) => Some(val),
+                    Err(_e) => Some(0),
+                };
 
-impl<T: Pod> Watcher<T> {
-    fn new(address: Vec<u64>) -> Self {
-        Self {
-            watcher: asr::watcher::Watcher::new(),
-            address,
-        }
-    }
+                let new_start = new_game_start_watcher.update(new_start_value).unwrap();
 
-    fn update(&mut self, process: &Process, module: u64) -> Option<&Pair<T>> {
-        let value = process.read_pointer_path64::<T>(module, &self.address);
-        self.watcher.update(value.ok())
-    }
-}
+                let loading = loading_watcher
+                    .update(
+                        process
+                            .read_pointer_path64(
+                                main_module_base,
+                                &vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA],
+                            )
+                            .ok(),
+                    )
+                    .unwrap();
 
-struct Game {
-    process: Process,
-    module: u64,
-    start: Watcher<u8>,
-    loading: Watcher<u8>,
-    splits: HashSet<String>,
-}
+                match timer::state() {
+                    TimerState::NotRunning => {
+                        if settings.start && start.old == 9 && start.current != 9 {
+                            // asr::print_message("Clearing Splits and Starting");
+                            splits = HashSet::<String>::new();
+                            timer::start();
+                        }
 
-impl Game {
-    fn new(process: Process, module: u64) -> Option<Self> {
-        let game = Self {
-            process,
-            module,
-            start: Watcher::new(vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]), // CurrentGameChapterID
-            loading: Watcher::new(vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA]), // CurrentGameChapterID
-            splits: HashSet::new(),
-        };
-        Some(game)
-    }
+                        if settings.new_start && new_start.old == 0 && new_start.current == 158 {
+                            // asr::print_message("Clearing Splits and Starting");
+                            splits = HashSet::<String>::new();
+                            timer::start();
+                        }
+                    }
+                    TimerState::Running => {
+                        // CHAPTER SPLITS
 
-    fn reset_splits(&mut self) {
-        self.splits = HashSet::new();
-    }
+                        if settings.start_prehistory && start.old == 9 && start.current == 1 {
+                            split(&mut splits, "start_prehistory")
+                        }
+                        if settings.start_distant_future && start.old == 9 && start.current == 2 {
+                            split(&mut splits, "start_distant_future")
+                        }
+                        if settings.start_imperial_china && start.old == 9 && start.current == 3 {
+                            split(&mut splits, "start_imperial_china")
+                        }
+                        if settings.start_wild_west && start.old == 9 && start.current == 4 {
+                            split(&mut splits, "start_wild_west")
+                        }
+                        if settings.start_present_day && start.old == 9 && start.current == 5 {
+                            split(&mut splits, "start_present_day")
+                        }
+                        if settings.start_near_future && start.old == 9 && start.current == 6 {
+                            split(&mut splits, "start_near_future")
+                        }
+                        if settings.start_twilight_of_edo_japan && start.old == 9 && start.current == 7 {
+                            split(&mut splits, "start_twilight_of_edo_japan")
+                        }
+                        if settings.start_middle_ages && start.old == 9 && start.current == 0 {
+                            split(&mut splits, "start_middle_ages")
+                        }
+                        if settings.start_dominion_of_hate && start.old == 9 && start.current == 7 {
+                            split(&mut splits, "start_dominion_of_hate")
+                        }
 
-    fn update_vars(&mut self) -> Option<Vars<'_>> {
-        Some(Vars {
-            start: self.start.update(&self.process, self.module)?,
-            loading: self.loading.update(&self.process, self.module)?,
-            splits: &mut self.splits,
+                        if settings.load_removal {
+                            // load/save removal
+                            if loading.old == 0 && loading.current == 1 {
+                                timer::resume_game_time()
+                            }
+
+                            if loading.old == 1 && loading.current == 0 {
+                                timer::pause_game_time()
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+                // TODO: Do something on every tick.
+                next_tick().await;
+            }
         })
-    }
+        .await;
 }
 
-#[allow(unused)]
-pub struct Vars<'a> {
-    start: &'a Pair<u8>,
-    loading: &'a Pair<u8>,
-    splits: &'a mut HashSet<String>,
-}
-
-impl Vars<'_> {
-    fn split(&mut self, key: &str, settings_field: bool) -> Option<String> {
-        if self.splits.contains(key) {
-            return None;
-        }
-
-        self.splits.insert(key.to_string());
-
-        // only split if in settings
-        if settings_field {
-            return Some(key.to_string());
-        }
-
-        None
+pub fn split(splits: &mut HashSet<String>, key: &str) {
+    if !splits.contains(key) {
+        splits.insert(key.to_string());
+        asr::print_message(&key.to_string());
+        timer::split()
     }
-}
-
-pub struct Splits(HashSet<String>);
-
-#[no_mangle]
-pub extern "C" fn update() {
-    let mut state = STATE.lock();
-    if state.settings.is_none() {
-        state.settings = Some(Settings::register());
-        return;
-    }
-
-    let settings = state.settings.clone().unwrap();
-
-    if state.game.is_none() {
-        match Process::attach("LIVEALIVE") {
-            Some(process) => {
-                match process.get_module_address("LIVEALIVE-Win64-Shipping.exe") {
-                    Ok(Address(module)) => {
-                        asr::print_message("attached to process");
-
-                        state.game = Game::new(process, module)
-                    }
-                    _ => (),
-                };
-            }
-            None => (),
-        }
-    }
-
-    // linux 
-    if state.game.is_none() {
-        match Process::attach("LIVEALIVE") {
-            Some(process) => {
-                match process.get_module_address("LIVEALIVE-Win64-Shipping.exe") {
-                    Ok(Address(module)) => {
-                        asr::print_message("attached to process");
-
-                        state.game = Game::new(process, module)
-                    }
-                    _ => (),
-                };
-            }
-            None => (),
-        }
-    }
-
-    if let Some(game) = &mut state.game {
-        if !game.process.is_open() {
-            state.game = None;
-            return;
-        }
-
-        if let Some(mut vars) = game.update_vars() {
-            match timer::state() {
-                TimerState::NotRunning => {
-                    if settings.start && vars.start.old == 9 && vars.start.current != 9 {
-                        game.reset_splits();
-                        timer::start();
-                    }
-                }
-                TimerState::Running => {
-                    if let Some(reason) = should_split(&mut vars, &settings) {
-                        asr::print_message(&reason);
-                        timer::split();
-                    }
-
-                    if settings.load_removal {
-                        // load/save removal
-                        if vars.loading.old == 0 && vars.loading.current == 1 {
-                            timer::resume_game_time()
-                        }
-
-                        if vars.loading.old == 1 && vars.loading.current == 0 {
-                            timer::pause_game_time()
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
-}
-
-fn should_split(vars: &mut Vars, settings: &Settings) -> Option<String> {
-    // if let Some(split) = splits::hikari::HikariSplits::split(vars, &settings) {
-    //     return Some(split);
-    // }
-
-    None
 }
