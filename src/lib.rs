@@ -12,10 +12,6 @@ asr::async_main!(stable);
 
 async fn main() {
     // TODO: Set up some general state and settings.
-
-
-    // let mut start = Watcher::<u8>::new(vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]); // CurrentGameChapterID
-    // let mut loading = Watcher::<u8>::new(vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA]); // CurrentGameChapterID
     let mut start_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
     let mut new_game_start_watcher = Watcher::<u8>::new(); // Start Trigger for New Game
     let mut loading_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
@@ -49,19 +45,19 @@ async fn main() {
                         Ok(val) => Some(val),
                         Err(_e) => Some(0),
                     };
-                    
+
                     let new_start = new_game_start_watcher.update(new_start_value).unwrap();
 
-//                     let loading = loading_watcher
-//                         .update(
-//                             process
-//                                 .read_pointer_path64(
-//                                     main_module_base,
-//                                     &vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA],
-//                                 )
-//                                 .ok(),
-//                         )
-//                         .unwrap();
+                    let loading = loading_watcher
+                        .update(
+                            process
+                                .read_pointer_path64(
+                                    main_module_base,
+                                    &vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
+                                )
+                                .ok(),
+                        )
+                        .unwrap();
 
                     match timer::state() {
                         TimerState::NotRunning => {
@@ -83,10 +79,12 @@ async fn main() {
                             if settings.start_prehistory && start.old == 9 && start.current == 1 {
                                 split(&mut splits, "start_prehistory")
                             }
-                            if settings.start_distant_future && start.old == 9 && start.current == 2 {
+                            if settings.start_distant_future && start.old == 9 && start.current == 2
+                            {
                                 split(&mut splits, "start_distant_future")
                             }
-                            if settings.start_imperial_china && start.old == 9 && start.current == 3 {
+                            if settings.start_imperial_china && start.old == 9 && start.current == 3
+                            {
                                 split(&mut splits, "start_imperial_china")
                             }
                             if settings.start_wild_west && start.old == 9 && start.current == 4 {
@@ -98,26 +96,35 @@ async fn main() {
                             if settings.start_near_future && start.old == 9 && start.current == 6 {
                                 split(&mut splits, "start_near_future")
                             }
-                            if settings.start_twilight_of_edo_japan && start.old == 9 && start.current == 7 {
+                            if settings.start_twilight_of_edo_japan
+                                && start.old == 9
+                                && start.current == 7
+                            {
                                 split(&mut splits, "start_twilight_of_edo_japan")
                             }
                             if settings.start_middle_ages && start.old == 9 && start.current == 0 {
                                 split(&mut splits, "start_middle_ages")
                             }
-                            if settings.start_dominion_of_hate && start.old == 9 && start.current == 7 {
+                            if settings.start_dominion_of_hate
+                                && start.old == 9
+                                && start.current == 7
+                            {
                                 split(&mut splits, "start_dominion_of_hate")
                             }
 
-//                             if settings.load_removal {
-//                                 // load/save removal
-//                                 if loading.old == 0 && loading.current == 1 {
-//                                     timer::resume_game_time()
-//                                 }
+                            if settings.load_removal {
+                                // load/save removal
 
-//                                 if loading.old == 1 && loading.current == 0 {
-//                                     timer::pause_game_time()
-//                                 }
-//                             }
+                                if loading.old == 0 && loading.current == 1 {
+                                    // asr::print_message("resuming game time");
+                                    timer::resume_game_time()
+                                }
+
+                                if loading.old == 1 && loading.current == 0 {
+                                    // asr::print_message("pausing game time");
+                                    timer::pause_game_time()
+                                }
+                            }
                         }
                         _ => {}
                     }

@@ -6,9 +6,9 @@ pub struct Settings {
     #[default = false]
     /// Automatic Start on New Game
     pub new_start: bool,
-//     #[default = false]
-//     /// Load Removal
-//     pub load_removal: bool,
+    #[default = false]
+    /// Load Removal
+    pub load_removal: bool,
     #[default = false]
     /// Start Prehistory
     pub start_prehistory: bool,
@@ -36,5 +36,4 @@ pub struct Settings {
     #[default = false]
     /// Start Dominion of Hate
     pub start_dominion_of_hate: bool,
-    
 }
