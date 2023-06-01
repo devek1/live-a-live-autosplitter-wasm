@@ -49,7 +49,7 @@ async fn main() {
                         Ok(val) => Some(val),
                         Err(_e) => Some(0),
                     };
-
+                    
                     let new_start = new_game_start_watcher.update(new_start_value).unwrap();
 
 //                     let loading = loading_watcher
@@ -71,7 +71,7 @@ async fn main() {
                                 timer::start();
                             }
 
-                            if settings.new_start && new_start.old == 0 && new_start.current == 158 {
+                            if settings.new_start && new_start.old == 0 && new_start.current > 0 {
                                 // asr::print_message("Clearing Splits and Starting");
                                 splits = HashSet::<String>::new();
                                 timer::start();
