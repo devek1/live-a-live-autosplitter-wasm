@@ -52,16 +52,16 @@ async fn main() {
 
                     let new_start = new_game_start_watcher.update(new_start_value).unwrap();
 
-                    let loading = loading_watcher
-                        .update(
-                            process
-                                .read_pointer_path64(
-                                    main_module_base,
-                                    &vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA],
-                                )
-                                .ok(),
-                        )
-                        .unwrap();
+//                     let loading = loading_watcher
+//                         .update(
+//                             process
+//                                 .read_pointer_path64(
+//                                     main_module_base,
+//                                     &vec![0x5092A98, 0x8, 0x10, 0x1f8, 0x50, 0x30, 0x3FA],
+//                                 )
+//                                 .ok(),
+//                         )
+//                         .unwrap();
 
                     match timer::state() {
                         TimerState::NotRunning => {
@@ -108,16 +108,16 @@ async fn main() {
                                 split(&mut splits, "start_dominion_of_hate")
                             }
 
-                            if settings.load_removal {
-                                // load/save removal
-                                if loading.old == 0 && loading.current == 1 {
-                                    timer::resume_game_time()
-                                }
+//                             if settings.load_removal {
+//                                 // load/save removal
+//                                 if loading.old == 0 && loading.current == 1 {
+//                                     timer::resume_game_time()
+//                                 }
 
-                                if loading.old == 1 && loading.current == 0 {
-                                    timer::pause_game_time()
-                                }
-                            }
+//                                 if loading.old == 1 && loading.current == 0 {
+//                                     timer::pause_game_time()
+//                                 }
+//                             }
                         }
                         _ => {}
                     }
