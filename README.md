@@ -40,6 +40,10 @@ Select Automatic Start on character select
 
 Ending split must be done manually for now.
 
+### NOTE
+
+!!! ENSURE YOU EITHER HAVE YOUR TIMING METHOD ON THE TIMER COMPONENT SET TO `GAME TIME` OR MAKE TWO TIMERS AND SET ONE TO `GAME TIME` !!!
+
 ## build
 
 1. install rustup + stable rust https://rustup.rs/
