@@ -107,7 +107,7 @@ async fn main() {
                             }
                             if settings.start_dominion_of_hate
                                 && start.old == 9
-                                && start.current == 7
+                                && start.current == 8
                             {
                                 split(&mut splits, "start_dominion_of_hate")
                             }
