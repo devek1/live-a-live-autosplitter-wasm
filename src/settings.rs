@@ -1,14 +1,12 @@
 #[derive(asr::Settings, Clone)]
 pub struct Settings {
-    //#[default = false]
-    /// Automatic Start on character select
-    pub start: bool,
-
-    /// Automatic Start on New Game
-    pub new_start: bool,
-
+    #[default = true]
     /// Load Removal
     pub load_removal: bool,
+    /// Automatic Start on character select
+    pub start: bool,
+    /// Automatic Start on New Game
+    pub new_start: bool,
     /// Start Prehistory
     pub start_prehistory: bool,
     /// Start Distant Future
