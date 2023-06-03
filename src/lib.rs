@@ -23,11 +23,9 @@ async fn main() {
             "linux" => Process::wait_attach("LIVEALIVE-Win64").await,
             _ => Process::wait_attach("LIVEALIVE-Win64-Shipping.exe").await
         };
-        let (main_module_base, main_module_size) = process
+        let (main_module_base, _main_module_size) = process
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
-
-        asr::print_message(&main_module_size.to_string());
 
         process
             .until_closes(async {
