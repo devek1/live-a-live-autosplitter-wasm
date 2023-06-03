@@ -59,7 +59,7 @@ async fn main() {
                     let near_future_scenario_progress = near_future_scenario_progress_watcher
                         .update(near_future_scenario_progress_value)
                         .unwrap();
-                    asr::print_message(&near_future_scenario_progress.current.to_string());
+                    // asr::print_message(&near_future_scenario_progress.current.to_string());
 
                     let loading = loading_watcher
                         .update(
