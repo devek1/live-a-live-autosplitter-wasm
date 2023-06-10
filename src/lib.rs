@@ -116,42 +116,42 @@ async fn main() {
                             if settings.start_near_future && start.old == 9 && start.current == 6 {
                                 split(&mut splits, "start_near_future")
                             }
-                            // if settings.near_future_park
-                            //     && near_future_scenario_progress.old == 85
-                            //     && near_future_scenario_progress.current == 110
-                            // {
-                            //     split(&mut splits, "near_future_park")
-                            // }
-                            // if settings.near_future_enter_titan
-                            //     && near_future_scenario_progress.old == 270
-                            //     && near_future_scenario_progress.current == 280
-                            // {
-                            //     split(&mut splits, "near_future_enter_titan")
-                            // }
-                            // if settings.near_future_dock
-                            //     && near_future_scenario_progress.old == 380
-                            //     && near_future_scenario_progress.current == 390
-                            // {
-                            //     split(&mut splits, "near_future_dock")
-                            // }
-                            // if settings.near_future_matsu_joins
-                            //     && near_future_scenario_progress.old == 410
-                            //     && near_future_scenario_progress.current == 450
-                            // {
-                            //     split(&mut splits, "near_future_matsu_joins")
-                            // }
-                            // if settings.near_future_robot
-                            //     && near_future_scenario_progress.old == 460
-                            //     && near_future_scenario_progress.current == 490
-                            // {
-                            //     split(&mut splits, "near_future_robot")
-                            // }
-                            // if settings.near_future_enter_titan_2
-                            //     && near_future_scenario_progress.old == 670
-                            //     && near_future_scenario_progress.current == 746
-                            // {
-                            //     split(&mut splits, "near_future_enter_titan_2")
-                            // }
+                            if settings.near_future_park
+                                && near_future_scenario_progress.old == 85
+                                && near_future_scenario_progress.current == 110
+                            {
+                                split(&mut splits, "near_future_park")
+                            }
+                            if settings.near_future_enter_titan
+                                && near_future_scenario_progress.old == 270
+                                && near_future_scenario_progress.current == 280
+                            {
+                                split(&mut splits, "near_future_enter_titan")
+                            }
+                            if settings.near_future_dock
+                                && near_future_scenario_progress.old == 380
+                                && near_future_scenario_progress.current == 390
+                            {
+                                split(&mut splits, "near_future_dock")
+                            }
+                            if settings.near_future_matsu_joins
+                                && near_future_scenario_progress.old == 410
+                                && near_future_scenario_progress.current == 450
+                            {
+                                split(&mut splits, "near_future_matsu_joins")
+                            }
+                            if settings.near_future_robot
+                                && near_future_scenario_progress.old == 460
+                                && near_future_scenario_progress.current == 490
+                            {
+                                split(&mut splits, "near_future_robot")
+                            }
+                            if settings.near_future_enter_titan_2
+                                && near_future_scenario_progress.old == 670
+                                && near_future_scenario_progress.current == 746
+                            {
+                                split(&mut splits, "near_future_enter_titan_2")
+                            }
 
                             if settings.start_twilight_of_edo_japan
                                 && start.old == 9
