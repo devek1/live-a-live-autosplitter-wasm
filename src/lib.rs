@@ -33,15 +33,15 @@ async fn main() {
                 // TODO: Load some initial information from the process.
                 loop {
                     settings.update();
-                    let start = start_watcher
-                        .update(
-                            process
-                                .read_pointer_path64(
+                    let start_value = match process.read_pointer_path64(
                                     main_module_base,
                                     &vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28],
-                                )
-                                .ok(),
-                        )
+                                ) {
+                            Ok(val) => Some(val),
+                            Err(_e) => Some(0),
+                    };
+                    let start = start_watcher
+                        .update(start_value)
                         .unwrap();
 
                     let new_start_value = match process.read_pointer_path64(
@@ -64,18 +64,17 @@ async fn main() {
                     let near_future_scenario_progress = near_future_scenario_progress_watcher
                         .update(near_future_scenario_progress_value)
                         .unwrap();
-                    // asr::print_message(&near_future_scenario_progress.current.to_string());
 
-                    let loading = loading_watcher
-                        .update(
-                            process
-                                .read_pointer_path64(
-                                    main_module_base,
-                                    &vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
-                                )
-                                .ok(),
-                        )
-                        .unwrap();
+                    // asr::print_message(&near_future_scenario_progress.current.to_string());
+                    let loading_value = match process.read_pointer_path64(
+                        main_module_base,
+                        &vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
+                    ) {
+                            Ok(val) => Some(val),
+                            Err(_e) => Some(0),
+                        };
+
+                    let loading = loading_watcher.update(loading_value).unwrap();
 
                     // Scenario Progress
 
