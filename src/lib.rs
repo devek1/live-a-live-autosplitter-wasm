@@ -19,6 +19,7 @@ async fn main() {
     let mut splits = HashSet::<String>::new();
     let settings = Settings::register();
     loop {
+        settings.update();
         let process = match asr::get_os().ok().unwrap().as_str() {
             "linux" => Process::wait_attach("LIVEALIVE-Win64").await,
             _ => Process::wait_attach("LIVEALIVE-Win64-Shipping.exe").await,

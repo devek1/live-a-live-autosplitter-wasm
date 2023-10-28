@@ -1,4 +1,4 @@
-#[derive(asr::Settings, Clone)]
+#[derive(asr::settings::Gui)]
 pub struct Settings {
     #[default = true]
     /// Load Removal
