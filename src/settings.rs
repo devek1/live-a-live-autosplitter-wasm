@@ -1,4 +1,6 @@
-#[derive(asr::settings::Gui)]
+use asr::settings::Gui;
+
+#[derive(Debug, Gui)]
 pub struct Settings {
     #[default = true]
     /// Load Removal
