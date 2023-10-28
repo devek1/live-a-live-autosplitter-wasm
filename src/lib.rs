@@ -3,6 +3,7 @@ use asr::{
     timer::{self, TimerState},
     watcher::Watcher,
     Process,
+    settings::Gui 
 };
 mod settings;
 use settings::Settings;
@@ -17,9 +18,8 @@ async fn main() {
     let mut loading_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
     let mut near_future_scenario_progress_watcher = Watcher::<u32>::new(); // CurrentGameChapterID
     let mut splits = HashSet::<String>::new();
-    let settings = Settings::register();
+    let mut settings = Settings::register();
     loop {
-        settings.update();
         let process = match asr::get_os().ok().unwrap().as_str() {
             "linux" => Process::wait_attach("LIVEALIVE-Win64").await,
             _ => Process::wait_attach("LIVEALIVE-Win64-Shipping.exe").await,
@@ -32,6 +32,7 @@ async fn main() {
             .until_closes(async {
                 // TODO: Load some initial information from the process.
                 loop {
+                    settings.update();
                     let start = start_watcher
                         .update(
                             process
