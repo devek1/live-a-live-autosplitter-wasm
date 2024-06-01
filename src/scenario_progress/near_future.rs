@@ -1,0 +1,63 @@
+use std::collections::HashSet;
+
+use crate::settings::Settings;
+use crate::split;
+use crate::Chapter;
+use asr::watcher::Pair;
+
+pub struct NearFuture;
+impl NearFuture {
+    pub fn maybe_split(
+        settings: &Settings,
+        splits: &mut HashSet<String>,
+        current_chapter: &Pair<u8>,
+        scenario_progress: &Pair<u16>,
+    ) {
+        // Start Split
+        if settings.start_near_future
+            && current_chapter.old == Chapter::Menu as u8
+            && current_chapter.current == Chapter::NearFuture as u8
+        {
+            split(splits, "start_near_future")
+        }
+
+        if current_chapter.current == Chapter::NearFuture as u8 {
+            if settings.near_future_park
+                && scenario_progress.old == 85
+                && scenario_progress.current == 110
+            {
+                split(splits, "near_future_park")
+            }
+            if settings.near_future_enter_titan
+                && scenario_progress.old == 270
+                && scenario_progress.current == 280
+            {
+                split(splits, "near_future_enter_titan")
+            }
+            if settings.near_future_dock
+                && scenario_progress.old == 380
+                && scenario_progress.current == 390
+            {
+                split(splits, "near_future_dock")
+            }
+            if settings.near_future_matsu_joins
+                && scenario_progress.old == 410
+                && scenario_progress.current == 450
+            {
+                split(splits, "near_future_matsu_joins")
+            }
+            if settings.near_future_robot
+                && scenario_progress.old == 460
+                && scenario_progress.current == 490
+            {
+                split(splits, "near_future_robot")
+            }
+            if settings.near_future_enter_titan_2
+                && scenario_progress.old == 670
+                && scenario_progress.current == 746
+            {
+                split(splits, "near_future_enter_titan_2")
+            }
+        }
+    }
+}

@@ -1,22 +1,75 @@
 use asr::{
     future::next_tick,
+    settings::Gui,
     timer::{self, TimerState},
-    watcher::Watcher,
-    Process,
-    settings::Gui 
+    watcher::{Pair, Watcher},
+    Address, Process,
 };
+mod scenario_progress;
 mod settings;
+
 use settings::Settings;
 use std::collections::HashSet;
 
 asr::async_main!(stable);
 
+struct GamePointer<T: Clone> {
+    pub address: Vec<u64>,
+    pub watcher: Watcher<T>,
+    pub module_base: Address,
+}
+
+impl<T: Clone + bytemuck::Pod> GamePointer<T> {
+    pub fn new(module_base: Address, address: Vec<u64>) -> GamePointer<T> {
+        GamePointer {
+            watcher: Watcher::<T>::new(),
+            address,
+            module_base,
+        }
+    }
+    pub fn update_value(&mut self, process: &Process) -> Pair<T> {
+        let value: Option<T> = match process.read_pointer_path64(self.module_base, &self.address) {
+            Ok(val) => Some(val),
+            Err(_e) => None,
+        };
+
+        return *self.watcher.update_infallible(value.unwrap());
+    }
+}
+
+// fn get_offset(chapter: u8) -> u64 {
+//     return match chapter {
+//         0 => 0x70,
+//         1 => 0x330,
+//         2 => 0x5F0,
+//         3 => 0x8B0,
+//         4 => 0xB70,
+//         5 => 0xE30,
+//         6 => 0x10F0,
+//         7 => 0x13B0,
+//         8 => 0x1670,
+//         9 => 0x1930,
+//         10 => 0x1BF0,
+//         _ => 0x0
+//     };
+// }
+
+#[repr(u8)]
+enum Chapter {
+    MiddleAges = 0,         // Oersted
+    NearFuture = 6,         // Akira
+    TwilightOfEdoJapan = 7, // Oborumaru
+    DominionOfHate = 8,
+    Menu = 9,
+}
+
 async fn main() {
     // TODO: Set up some general state and settings.
-    let mut start_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
-    let mut new_game_start_watcher = Watcher::<u8>::new(); // Start Trigger for New Game
+
+    //let mut transition_state = Watcher::<u32>::new(); // Transition State for various game states
+
     let mut loading_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
-    let mut near_future_scenario_progress_watcher = Watcher::<u32>::new(); // CurrentGameChapterID
+                                                    // let mut scenario_progress_watcher = Watcher::<u32>::new(); // CurrentGameChapterID
     let mut splits = HashSet::<String>::new();
     let mut settings = Settings::register();
     loop {
@@ -28,51 +81,38 @@ async fn main() {
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
 
+        let mut current_chapter_pointer =
+            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]);
+        let mut new_game_start_pointer =
+            GamePointer::<u8>::new(main_module_base, vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348]);
+        let mut scenario_progress_pointer =
+            GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
+
+        asr::print_message("UPDATING");
         process
             .until_closes(async {
                 // TODO: Load some initial information from the process.
                 loop {
                     settings.update();
-                    let start_value = match process.read_pointer_path64(
-                                    main_module_base,
-                                    &vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28],
-                                ) {
-                            Ok(val) => Some(val),
-                            Err(_e) => Some(0),
-                    };
-                    let start = start_watcher
-                        .update(start_value)
-                        .unwrap();
 
-                    let new_start_value = match process.read_pointer_path64(
-                        main_module_base,
-                        &vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348],
-                    ) {
-                        Ok(val) => Some(val),
-                        Err(_e) => Some(0),
-                    };
-                    let new_start = new_game_start_watcher.update(new_start_value).unwrap();
+                    let current_chapter = current_chapter_pointer.update_value(&process);
+                    let new_game_start = new_game_start_pointer.update_value(&process);
+                    let scenario_progress = scenario_progress_pointer.update_value(&process);
+                    timer::set_variable_int("Current Chapter", current_chapter.current);
+                    timer::set_variable_int("Scenario Progress", scenario_progress.current);
 
-                    // TODO: Move all this to one query to join it all at once instead of recursing
-                    let near_future_scenario_progress_value = match process.read_pointer_path64(
-                        main_module_base,
-                        &vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x30, 0x1080 + 0x70],
-                    ) {
-                        Ok(val) => Some(val),
-                        Err(_e) => Some(0),
-                    };
-                    let near_future_scenario_progress = near_future_scenario_progress_watcher
-                        .update(near_future_scenario_progress_value)
-                        .unwrap();
+                    // if current_chapter.current == Chapter::Oborumaru as u8 {
+                    //     asr::print_message("OBORO");
+                    // }
 
-                    // asr::print_message(&near_future_scenario_progress.current.to_string());
+                    // asr::print_message(&scenario_progress.current.to_string());
                     let loading_value = match process.read_pointer_path64(
                         main_module_base,
                         &vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
                     ) {
-                            Ok(val) => Some(val),
-                            Err(_e) => Some(0),
-                        };
+                        Ok(val) => Some(val),
+                        Err(_e) => Some(0),
+                    };
 
                     let loading = loading_watcher.update(loading_value).unwrap();
 
@@ -80,13 +120,19 @@ async fn main() {
 
                     match timer::state() {
                         TimerState::NotRunning => {
-                            if settings.start && start.old == 9 && start.current != 9 {
+                            if settings.start
+                                && current_chapter.old == 9
+                                && current_chapter.current != 9
+                            {
                                 // asr::print_message("Clearing Splits and Starting");
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
 
-                            if settings.new_start && new_start.old == 0 && new_start.current > 0 {
+                            if settings.new_start
+                                && new_game_start.old == 0
+                                && new_game_start.current > 0
+                            {
                                 // asr::print_message("Clearing Splits and Starting");
                                 splits = HashSet::<String>::new();
                                 timer::start();
@@ -95,80 +141,65 @@ async fn main() {
                         TimerState::Running => {
                             // CHAPTER SPLITS
 
-                            if settings.start_prehistory && start.old == 9 && start.current == 1 {
+                            if settings.start_prehistory
+                                && current_chapter.old == 9
+                                && current_chapter.current == 1
+                            {
                                 split(&mut splits, "start_prehistory")
                             }
-                            if settings.start_distant_future && start.old == 9 && start.current == 2
+                            if settings.start_distant_future
+                                && current_chapter.old == 9
+                                && current_chapter.current == 2
                             {
                                 split(&mut splits, "start_distant_future")
                             }
-                            if settings.start_imperial_china && start.old == 9 && start.current == 3
+                            if settings.start_imperial_china
+                                && current_chapter.old == 9
+                                && current_chapter.current == 3
                             {
                                 split(&mut splits, "start_imperial_china")
                             }
-                            if settings.start_wild_west && start.old == 9 && start.current == 4 {
+                            if settings.start_wild_west
+                                && current_chapter.old == 9
+                                && current_chapter.current == 4
+                            {
                                 split(&mut splits, "start_wild_west")
                             }
-                            if settings.start_present_day && start.old == 9 && start.current == 5 {
+                            if settings.start_present_day
+                                && current_chapter.old == 9
+                                && current_chapter.current == 5
+                            {
                                 split(&mut splits, "start_present_day")
                             }
 
                             // Near Future
-                            if settings.start_near_future && start.old == 9 && start.current == 6 {
-                                split(&mut splits, "start_near_future")
-                            }
-                            if settings.near_future_park
-                                && near_future_scenario_progress.old == 85
-                                && near_future_scenario_progress.current == 110
-                            {
-                                split(&mut splits, "near_future_park")
-                            }
-                            if settings.near_future_enter_titan
-                                && near_future_scenario_progress.old == 270
-                                && near_future_scenario_progress.current == 280
-                            {
-                                split(&mut splits, "near_future_enter_titan")
-                            }
-                            if settings.near_future_dock
-                                && near_future_scenario_progress.old == 380
-                                && near_future_scenario_progress.current == 390
-                            {
-                                split(&mut splits, "near_future_dock")
-                            }
-                            if settings.near_future_matsu_joins
-                                && near_future_scenario_progress.old == 410
-                                && near_future_scenario_progress.current == 450
-                            {
-                                split(&mut splits, "near_future_matsu_joins")
-                            }
-                            if settings.near_future_robot
-                                && near_future_scenario_progress.old == 460
-                                && near_future_scenario_progress.current == 490
-                            {
-                                split(&mut splits, "near_future_robot")
-                            }
-                            if settings.near_future_enter_titan_2
-                                && near_future_scenario_progress.old == 670
-                                && near_future_scenario_progress.current == 746
-                            {
-                                split(&mut splits, "near_future_enter_titan_2")
-                            }
+                            scenario_progress::near_future::NearFuture::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+                            
+                            scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
 
-                            if settings.start_twilight_of_edo_japan
-                                && start.old == 9
-                                && start.current == 7
-                            {
-                                split(&mut splits, "start_twilight_of_edo_japan")
-                            }
-                            if settings.start_middle_ages && start.old == 9 && start.current == 0 {
-                                split(&mut splits, "start_middle_ages")
-                            }
-                            if settings.start_dominion_of_hate
-                                && start.old == 9
-                                && start.current == 8
-                            {
-                                split(&mut splits, "start_dominion_of_hate")
-                            }
+                            scenario_progress::middle_ages::MiddleAges::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+
+                            scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
 
                             if settings.load_removal {
                                 // load/save removal
