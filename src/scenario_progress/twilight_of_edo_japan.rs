@@ -39,7 +39,7 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_defeat_gennai
-                && scenario_progress.old > 80
+                && scenario_progress.old >= 80
                 && scenario_progress.old < 120
                 && scenario_progress.current == 120
             {
@@ -64,7 +64,7 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_defeat_monks
-                && scenario_progress.old > 130
+                && scenario_progress.old >= 130
                 && scenario_progress.old < 160
                 && scenario_progress.current == 160
             {
