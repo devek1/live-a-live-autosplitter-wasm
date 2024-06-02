@@ -1,4 +1,9 @@
+pub mod dominion_of_hate;
 pub mod middle_ages;
 pub mod near_future;
 pub mod twilight_of_edo_japan;
-pub mod dominion_of_hate;
+pub mod prehistory;
+pub mod distant_future;
+pub mod imperial_china;
+pub mod wild_west;
+pub mod present_day;

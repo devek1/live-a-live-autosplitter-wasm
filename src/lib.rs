@@ -13,6 +13,81 @@ use std::collections::HashSet;
 
 asr::async_main!(stable);
 
+struct ChapterData {
+  character_data: Vec<CharacterData>,
+  map_id: u32,
+}
+
+impl ChapterData {
+    pub fn update(&mut self, process: &Process, module_base: Address) {
+        self.update_character_data(process, module_base);
+        self.update_map_id(process, module_base);
+    }
+
+    pub fn update_character_data(&mut self, process: &Process, module_base: Address) {
+        let mut character_data: Vec<CharacterData> = vec![];
+
+        let count_addr = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x158];
+
+        let count: Option<u8> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &count_addr) {
+            Ok(val) => Some(val),
+            Err(_e) => Some(0),
+        };
+
+        const SIZE: u64 = 0xB0;
+
+        for x in 0..count.unwrap() {
+            let offset: u64 = (x as u64) * SIZE;
+            let mut data_addr: Vec<u64> = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x150];
+
+            data_addr.push(offset);
+            
+            let character_data_struct: Option<CharacterData> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64,  &data_addr) {
+                Ok(val) => Some(val),
+                Err(_e) => None,
+            };
+            if let Some(val) = character_data_struct {
+                character_data.push(val);
+            }
+        }
+        self.character_data = character_data;
+    }
+
+    pub fn update_map_id(&mut self, process: &Process, module_base: Address) {
+
+        let map_id_addr = vec![ 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418];
+
+        let map_id: Option<u32> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &map_id_addr) {
+            Ok(val) => Some(val),
+            Err(_e) => Some(0),
+        };
+
+        if let Some(val) = map_id {
+            self.map_id = val;
+        } else {
+            self.map_id = 0;
+        }
+        
+    }
+}
+
+#[derive(bytemuck::CheckedBitPattern, Copy, Clone)]
+#[repr(C)]
+struct CharacterData {
+   _tag_name: u64,
+   level: u32,
+   max_hp: u32,
+   physical_attack: u32,
+   physical_defense: u32,
+   special_attack: u32,
+   special_defense: u32,
+   agility: u32,
+   accuracy: u32,
+   evasion: u32,
+   exp: u32
+}
+
+
 struct GamePointer<T: Clone> {
     pub address: Vec<u64>,
     pub watcher: Watcher<T>,
@@ -28,50 +103,32 @@ impl<T: Clone + bytemuck::Pod> GamePointer<T> {
         }
     }
     pub fn update_value(&mut self, process: &Process) -> Pair<T> {
-        let value: Option<T> = match process.read_pointer_path64(self.module_base, &self.address) {
+        let value: Option<T> = match process.read_pointer_path(self.module_base, asr::PointerSize::Bit64, &self.address) {
             Ok(val) => Some(val),
-            Err(_e) => None,
+            Err(_e) => Some(T::zeroed()),
         };
-
         return *self.watcher.update_infallible(value.unwrap());
     }
 }
 
-// fn get_offset(chapter: u8) -> u64 {
-//     return match chapter {
-//         0 => 0x70,
-//         1 => 0x330,
-//         2 => 0x5F0,
-//         3 => 0x8B0,
-//         4 => 0xB70,
-//         5 => 0xE30,
-//         6 => 0x10F0,
-//         7 => 0x13B0,
-//         8 => 0x1670,
-//         9 => 0x1930,
-//         10 => 0x1BF0,
-//         _ => 0x0
-//     };
-// }
-
 #[repr(u8)]
 enum Chapter {
     MiddleAges = 0,         // Oersted
+    Prehistory = 1,         // Pogo
+    DistantFuture = 2,      // Cube
+    ImperialChina = 3,      // Master
+    WildWest = 4,           // Sundown
+    PresentDay = 5,         // Masaru
     NearFuture = 6,         // Akira
     TwilightOfEdoJapan = 7, // Oborumaru
-    DominionOfHate = 8,
+    DominionOfHate = 8,     // End Chapter3
     Menu = 9,
 }
 
 async fn main() {
-    // TODO: Set up some general state and settings.
-
-    //let mut transition_state = Watcher::<u32>::new(); // Transition State for various game states
-
-    let mut loading_watcher = Watcher::<u8>::new(); // CurrentGameChapterID
-                                                    // let mut scenario_progress_watcher = Watcher::<u32>::new(); // CurrentGameChapterID
     let mut splits = HashSet::<String>::new();
     let mut settings = Settings::register();
+    
     loop {
         let process = match asr::get_os().ok().unwrap().as_str() {
             "linux" => Process::wait_attach("LIVEALIVE-Win64").await,
@@ -80,49 +137,53 @@ async fn main() {
         let (main_module_base, _main_module_size) = process
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
-
+        // Managers
+        // 0x4A2DA88, 0x20, 0x20 // Engine off of GameInstance_C (for now).
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78 // World
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x120 // GameState
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118 // AuthorityGameMode
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338 // BattleManager
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x368 // EventManager
+        // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x417 // FieldManager -> CurrentMapTag.TagName
         let mut current_chapter_pointer =
             GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]);
         let mut new_game_start_pointer =
             GamePointer::<u8>::new(main_module_base, vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348]);
         let mut scenario_progress_pointer =
             GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
-
-        asr::print_message("UPDATING");
+        let mut loading_pointer =
+            GamePointer::<u16>::new(main_module_base, vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA]);
+        let mut chapter_data = ChapterData { character_data: vec![], map_id: 0 };
+        // asr::print_message("UPDATING");
         process
             .until_closes(async {
                 // TODO: Load some initial information from the process.
                 loop {
                     settings.update();
 
+                    let loading = loading_pointer.update_value(&process);
                     let current_chapter = current_chapter_pointer.update_value(&process);
                     let new_game_start = new_game_start_pointer.update_value(&process);
                     let scenario_progress = scenario_progress_pointer.update_value(&process);
-                    timer::set_variable_int("Current Chapter", current_chapter.current);
-                    timer::set_variable_int("Scenario Progress", scenario_progress.current);
 
-                    // if current_chapter.current == Chapter::Oborumaru as u8 {
-                    //     asr::print_message("OBORO");
-                    // }
+                    chapter_data.update(&process, main_module_base);
 
-                    // asr::print_message(&scenario_progress.current.to_string());
-                    let loading_value = match process.read_pointer_path64(
-                        main_module_base,
-                        &vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
-                    ) {
-                        Ok(val) => Some(val),
-                        Err(_e) => Some(0),
-                    };
-
-                    let loading = loading_watcher.update(loading_value).unwrap();
-
-                    // Scenario Progress
-
+                    // #[cfg(debug_assertions)]
+                    {
+                        timer::set_variable_int("Current Chapter", current_chapter.current);
+                        timer::set_variable_int("Scenario Progress", scenario_progress.current);
+                        timer::set_variable_int("Map ID", chapter_data.map_id);
+                        for (i, character) in chapter_data.character_data.clone().iter().enumerate() {
+                            timer::set_variable_int(&format!("Character {} Level:", i), character.level);
+                            timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
+                        }      
+                    }
+       
                     match timer::state() {
                         TimerState::NotRunning => {
                             if settings.start
-                                && current_chapter.old == 9
-                                && current_chapter.current != 9
+                                && current_chapter.old == Chapter::Menu as u8
+                                && current_chapter.current != Chapter::Menu as u8
                             {
                                 // asr::print_message("Clearing Splits and Starting");
                                 splits = HashSet::<String>::new();
@@ -141,45 +202,47 @@ async fn main() {
                         TimerState::Running => {
                             // CHAPTER SPLITS
 
-                            if settings.start_prehistory
-                                && current_chapter.old == 9
-                                && current_chapter.current == 1
-                            {
-                                split(&mut splits, "start_prehistory")
-                            }
-                            if settings.start_distant_future
-                                && current_chapter.old == 9
-                                && current_chapter.current == 2
-                            {
-                                split(&mut splits, "start_distant_future")
-                            }
-                            if settings.start_imperial_china
-                                && current_chapter.old == 9
-                                && current_chapter.current == 3
-                            {
-                                split(&mut splits, "start_imperial_china")
-                            }
-                            if settings.start_wild_west
-                                && current_chapter.old == 9
-                                && current_chapter.current == 4
-                            {
-                                split(&mut splits, "start_wild_west")
-                            }
-                            if settings.start_present_day
-                                && current_chapter.old == 9
-                                && current_chapter.current == 5
-                            {
-                                split(&mut splits, "start_present_day")
-                            }
+                            scenario_progress::prehistory::Prehistory::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
 
-                            // Near Future
-                            scenario_progress::near_future::NearFuture::maybe_split(
+                            scenario_progress::distant_future::DistantFuture::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+
+                            scenario_progress::imperial_china::ImperialChina::maybe_split(
                                 &settings,
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
                             );
                             
+                            scenario_progress::wild_west::WildWest::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+                            scenario_progress::present_day::PresentDay::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+    
+                            scenario_progress::near_future::NearFuture::maybe_split(
+                                &settings,
+                                &mut splits,
+                                &current_chapter,
+                                &scenario_progress,
+                            );
+
                             scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
                                 &settings,
                                 &mut splits,
