@@ -14,14 +14,13 @@ use std::collections::HashSet;
 asr::async_main!(stable);
 
 struct ChapterData {
-  character_data: Vec<CharacterData>,
-  map_id: u32,
+  pub character_data: Vec<CharacterData>,
+  pub map_id: GamePointer<u32>,
 }
 
 impl ChapterData {
     pub fn update(&mut self, process: &Process, module_base: Address) {
         self.update_character_data(process, module_base);
-        self.update_map_id(process, module_base);
     }
 
     pub fn update_character_data(&mut self, process: &Process, module_base: Address) {
@@ -51,23 +50,6 @@ impl ChapterData {
             }
         }
         self.character_data = character_data;
-    }
-
-    pub fn update_map_id(&mut self, process: &Process, module_base: Address) {
-
-        let map_id_addr = vec![ 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418];
-
-        let map_id: Option<u32> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &map_id_addr) {
-            Ok(val) => Some(val),
-            Err(_e) => Some(0),
-        };
-
-        if let Some(val) = map_id {
-            self.map_id = val;
-        } else {
-            self.map_id = 0;
-        }
-        
     }
 }
 
@@ -152,8 +134,8 @@ async fn main() {
         let mut scenario_progress_pointer =
             GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
         let mut loading_pointer =
-            GamePointer::<u16>::new(main_module_base, vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA]);
-        let mut chapter_data = ChapterData { character_data: vec![], map_id: 0 };
+            GamePointer::<u8>::new(main_module_base, vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA]);
+        let mut chapter_data = ChapterData { character_data: vec![], map_id: GamePointer::<u32>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418]) };
         // asr::print_message("UPDATING");
         process
             .until_closes(async {
@@ -165,6 +147,7 @@ async fn main() {
                     let current_chapter = current_chapter_pointer.update_value(&process);
                     let new_game_start = new_game_start_pointer.update_value(&process);
                     let scenario_progress = scenario_progress_pointer.update_value(&process);
+                    let map_id = chapter_data.map_id.update_value(&process);
 
                     chapter_data.update(&process, main_module_base);
 
@@ -172,7 +155,7 @@ async fn main() {
                     {
                         timer::set_variable_int("Current Chapter", current_chapter.current);
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
-                        timer::set_variable_int("Map ID", chapter_data.map_id);
+                        timer::set_variable_int("Map ID", map_id.current);
                         for (i, character) in chapter_data.character_data.clone().iter().enumerate() {
                             timer::set_variable_int(&format!("Character {} Level:", i), character.level);
                             timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
@@ -248,6 +231,8 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &chapter_data,
+                                &map_id,
                             );
 
                             scenario_progress::middle_ages::MiddleAges::maybe_split(
@@ -263,10 +248,10 @@ async fn main() {
                                 &current_chapter,
                                 &scenario_progress,
                             );
-
+                            
                             if settings.load_removal {
                                 // load/save removal
-
+                                timer::set_variable_int("LOADING", loading.current);
                                 if loading.old == 0 && loading.current == 1 {
                                     // asr::print_message("resuming game time");
                                     timer::resume_game_time()

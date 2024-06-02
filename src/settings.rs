@@ -57,4 +57,23 @@ pub struct Settings {
     /// Near Future - Enter Steel Titan 2
     pub near_future_enter_titan_2: bool,
     // Near Future - Chapter Complete
+
+    twilight_of_edo_japan: Title,
+    /// Edo Japan - After Dodging Attic Ninja
+    pub twilight_dodge_attic_ninja: bool,
+    /// Edo Japan - Level 5 (>56xp) Storehouse Leave
+    pub twilight_level_5_storehouse_leave: bool,
+    /// Edo Japan - OR: Level 6 Storehouse Leave
+    pub twilight_level_6_storehouse_leave: bool,
+    /// Edo Japan - Defeat Gennai
+    pub twilight_defeat_gennai: bool,
+    /// Edo Japan - After Dialog in room after Monk Trio
+    pub twilight_defeat_monks: bool,
+    /// Edo Japan - Defeat Musashi
+    pub twilight_defeat_musashi: bool,
+    /// Edo Japan - Defeat Yodogimi
+    pub twilight_defeat_yodogimi: bool,
+    /// Edo Japan - Defeat Ode Iou (Human Form)
+    pub twilight_defeat_ode_iou: bool,
+    // Edo Japan - Chapter Complete
 }
