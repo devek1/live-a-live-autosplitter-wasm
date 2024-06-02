@@ -5,6 +5,11 @@ use crate::split;
 use crate::Chapter;
 use asr::watcher::Pair;
 
+
+// Locations
+// 10228295 - outside storehouse
+// 10228695 - Inside Storehouse
+
 pub struct TwilightOfEdoJapan;
 impl TwilightOfEdoJapan {
     pub fn maybe_split(
