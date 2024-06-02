@@ -61,7 +61,7 @@ pub struct Settings {
     twilight_of_edo_japan: Title,
     /// Edo Japan - After Dodging Attic Ninja
     pub twilight_dodge_attic_ninja: bool,
-    /// Edo Japan - Level 5 (>56xp) Storehouse Leave
+    /// Edo Japan - Level 5 (>=56xp) Storehouse Leave
     pub twilight_level_5_storehouse_leave: bool,
     /// Edo Japan - OR: Level 6 Storehouse Leave
     pub twilight_level_6_storehouse_leave: bool,
