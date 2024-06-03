@@ -9,10 +9,14 @@ A multiplatform autosplitter for Live a Live (PC)
 - Split on next chapter start (only when timer is running)
 
 # TODO:
-- [ ] Character Story Splits (will look more into this at a later time)
+- [~] Character Story Splits
+   - partially done in `revamp` branch, going through to get scenario ids
 - [ ] Full game ending splits
     - [ ] final boss end flash (this is going to be a nightmare)
-
+- [ ] TODO: Determine a better way to handle Present Day defeated enemies.
+  - intVars + in controller Face icons dont work for last enemy (since the game does this intentionally so you can reload the save)
+  - Maybe add a collective split when the odie kill animation starts.
+  - [ ] map id change for starting odie.
 
 ## Install
 
