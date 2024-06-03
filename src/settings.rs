@@ -80,6 +80,20 @@ pub struct Settings {
     pub twilight_end_split: bool,
 
     present_day: Title,
+    // Present Day - Moribe Defeated
+    pub present_day_moribe_defeated: bool,
+    // Present Day - Max Morgan Defeated
+    pub present_day_max_morgan_defeated: bool,
+    // Present Day - Jackie Defeated
+    pub present_day_jackie_defeated: bool,
+    // Present Day - Namkiat Defeated
+    pub present_day_namkiat_defeated: bool,
+    // Present Day - Aja Defeated
+    pub present_day_aja_defeated: bool,
+    // Present Day - Tula Han Defeated
+    pub present_day_tula_han_defeated: bool,
+    // Present Day - Start Odie Fight
+    pub present_day_start_odie: bool,
     // Present Day - Chapter Complete
     pub present_day_end_split: bool,
 }

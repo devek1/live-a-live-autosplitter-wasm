@@ -14,7 +14,7 @@ impl Prehistory {
         _scenario_progress: &Pair<u16>,
     ) {
         // Start Split
-        if settings.start_middle_ages
+        if settings.start_prehistory
             && current_chapter.old == Chapter::Menu as u8
             && current_chapter.current == Chapter::Prehistory as u8
         {

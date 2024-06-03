@@ -14,7 +14,7 @@ impl WildWest {
         _scenario_progress: &Pair<u16>,
     ) {
         // Start Split
-        if settings.start_middle_ages
+        if settings.start_wild_west
             && current_chapter.old == Chapter::Menu as u8
             && current_chapter.current == Chapter::WildWest as u8
         {
