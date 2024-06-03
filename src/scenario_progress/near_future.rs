@@ -61,13 +61,6 @@ impl NearFuture {
             {
                 split(splits, "near_future_enter_titan_2")
             }
-            if settings.near_future_defeat_odeo
-                && scenario_progress.old == 760
-                && scenario_progress.current == 770
-            {
-                split(splits, "near_future_defeat_odeo")
-            }
-
             if settings.near_future_end_split
                 && scenario_progress.current == 900
                 && map_id.current == 0

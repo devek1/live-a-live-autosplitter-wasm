@@ -78,4 +78,8 @@ pub struct Settings {
     pub twilight_defeat_ode_iou: bool,
     // Edo Japan - Chapter Complete
     pub twilight_end_split: bool,
+
+    present_day: Title,
+    // Present Day - Chapter Complete
+    pub present_day_end_split: bool,
 }
