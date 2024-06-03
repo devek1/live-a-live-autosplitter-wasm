@@ -135,6 +135,8 @@ async fn main() {
             GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
         let mut loading_pointer =
             GamePointer::<u8>::new(main_module_base, vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA]);
+        let mut transition_state_pointer =
+            GamePointer::<u32>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x0 + 0x38, 0x0, 0x70, 0x6C]);
         let mut chapter_data = ChapterData { character_data: vec![], map_id: GamePointer::<u32>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418]) };
         // asr::print_message("UPDATING");
         process
@@ -149,6 +151,9 @@ async fn main() {
                     let scenario_progress = scenario_progress_pointer.update_value(&process);
                     let map_id = chapter_data.map_id.update_value(&process);
 
+                    let transition_state = transition_state_pointer.update_value(&process);
+                        
+
                     chapter_data.update(&process, main_module_base);
 
                     // #[cfg(debug_assertions)]
@@ -156,6 +161,7 @@ async fn main() {
                         timer::set_variable_int("Current Chapter", current_chapter.current);
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
                         timer::set_variable_int("Map ID", map_id.current);
+                        timer::set_variable_int("Transition State", transition_state.current);
                         for (i, character) in chapter_data.character_data.clone().iter().enumerate() {
                             timer::set_variable_int(&format!("Character {} Level:", i), character.level);
                             timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
@@ -224,6 +230,8 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &transition_state,
                             );
 
                             scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
@@ -233,6 +241,7 @@ async fn main() {
                                 &scenario_progress,
                                 &chapter_data,
                                 &map_id,
+                                &transition_state,
                             );
 
                             scenario_progress::middle_ages::MiddleAges::maybe_split(

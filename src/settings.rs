@@ -57,6 +57,7 @@ pub struct Settings {
     /// Near Future - Enter Steel Titan 2
     pub near_future_enter_titan_2: bool,
     // Near Future - Chapter Complete
+    pub near_future_end_split: bool,
 
     twilight_of_edo_japan: Title,
     /// Edo Japan - After Dodging Attic Ninja
@@ -76,4 +77,5 @@ pub struct Settings {
     /// Edo Japan - Defeat Ode Iou (Human Form)
     pub twilight_defeat_ode_iou: bool,
     // Edo Japan - Chapter Complete
+    pub twilight_end_split: bool,
 }

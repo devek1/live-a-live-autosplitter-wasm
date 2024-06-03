@@ -20,6 +20,7 @@ impl TwilightOfEdoJapan {
         scenario_progress: &Pair<u16>,
         chapter_data: &ChapterData,
         map_id: &Pair<u32>,
+        transition_state: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_twilight_of_edo_japan
@@ -90,6 +91,15 @@ impl TwilightOfEdoJapan {
                 && scenario_progress.current == 200
             {
                 split(splits, "twilight_defeat_ode_iou")
+            }
+
+            if settings.twilight_end_split
+                && scenario_progress.current == 280
+                && map_id.current == 0
+                && transition_state.old == 4
+                && transition_state.current == 0
+            {
+                split(splits, "twilight_end_split")
             }
         }
     }
