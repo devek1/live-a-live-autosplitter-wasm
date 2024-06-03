@@ -65,6 +65,12 @@ impl PresentDay {
             {
                 split(splits, "present_day_tula_han_defeated_split")
             }
+            if settings.present_day_start_odie
+                && map_id.old == 10228626
+                && map_id.current == 10228592
+            {
+                split(splits, "present_day_start_odie_split")
+            }
             if settings.present_day_end_split
                 && scenario_progress.current == 0
                 && map_id.current == 0

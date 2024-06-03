@@ -80,6 +80,8 @@ pub struct Settings {
     pub twilight_end_split: bool,
 
     present_day: Title,
+    #[heading_level = 2]
+    last_fight_before_odie_will_not_trigger: Title,
     // Present Day - Moribe Defeated
     pub present_day_moribe_defeated: bool,
     // Present Day - Max Morgan Defeated
