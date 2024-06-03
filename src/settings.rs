@@ -98,4 +98,20 @@ pub struct Settings {
     pub present_day_start_odie: bool,
     // Present Day - Chapter Complete
     pub present_day_end_split: bool,
+
+    wild_west: Title,
+    /// Wild West - Intro - Defeat Mad Dog
+    pub wild_west_defeat_mad_dog_intro: bool,
+    /// Wild West - Defeat Pike
+    pub wild_west_defeat_defeat_pike: bool, 
+    /// Wild West - Begin Ambush Phase
+    pub wild_west_begin_ambush_phase: bool, 
+    /// Wild West - End Ambush Phase
+    pub wild_west_end_ambush_phase: bool, 
+    /// Wild West - Defeat Odie O'Bright
+    pub wild_west_defeat_odie: bool, 
+    /// Wild West - Last Mad Dog Fight
+    pub wild_west_mad_dog_final: bool, 
+    /// Wild West - Chapter Complete
+    pub wild_west_end_split: bool, 
 }

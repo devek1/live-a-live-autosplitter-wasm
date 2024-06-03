@@ -252,6 +252,8 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &transition_state,
                             );
                             scenario_progress::present_day::PresentDay::maybe_split(
                                 &settings,
