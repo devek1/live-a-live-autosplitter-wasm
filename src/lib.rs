@@ -231,6 +231,8 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &transition_state,
                             );
 
                             scenario_progress::distant_future::DistantFuture::maybe_split(

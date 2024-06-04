@@ -114,4 +114,20 @@ pub struct Settings {
     pub wild_west_mad_dog_final: bool, 
     /// Wild West - Chapter Complete
     pub wild_west_end_split: bool, 
+
+    prehistory: Title,
+    /// Prehistory - Turn in meat to elder
+    pub prehistory_turn_in_meat_to_elder: bool, 
+    /// Prehistory - Defeat Cavemen
+    pub prehistory_defeat_cavemen: bool, 
+    /// Prehistory - Defeat Zaki 1
+    pub prehistory_defeat_zaki_1: bool, 
+    /// Prehistory - Defeat Zaki 2
+    pub prehistory_defeat_zaki_2: bool, 
+    /// Prehistory - Defeat Zaki 3
+    pub prehistory_defeat_zaki_3: bool, 
+    /// Prehistory - Defeat Odo
+    pub prehistory_defeat_odo: bool, 
+    /// Prehistory - Chapter Complete
+    pub prehistory_end_split: bool, 
 }
