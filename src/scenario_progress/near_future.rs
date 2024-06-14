@@ -26,7 +26,8 @@ impl NearFuture {
         if current_chapter.current == Chapter::NearFuture as u8 {
             // Put Scenario Splits Here
             if settings.near_future_park
-                && scenario_progress.old == 85
+                && scenario_progress.old >= 85
+                && scenario_progress.old < 110
                 && scenario_progress.current == 110
             {
                 split(splits, "near_future_park")
