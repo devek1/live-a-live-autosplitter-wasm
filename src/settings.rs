@@ -19,10 +19,13 @@ pub struct Settings {
     pub load_removal: bool,
 
     start_settings: Title,
-    /// Automatic Start on Character Select
+    /// Start on Character Select (Single Story Start)
     pub start: bool,
     /// Automatic Start on New Game
     pub new_start: bool,
+
+    // Full Game Chapter Splits
+    full_game_run_chapter_splits: Title,
     /// Start/Split on Prehistory
     pub start_prehistory: bool,
     /// Start/Split on Distant Future
