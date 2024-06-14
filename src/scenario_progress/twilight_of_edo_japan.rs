@@ -33,7 +33,8 @@ impl TwilightOfEdoJapan {
             
             // Put Scenario Splits Here
             if settings.twilight_dodge_attic_ninja
-                && scenario_progress.old == 70
+                && scenario_progress.old >= 70
+                && scenario_progress.old < 80
                 && scenario_progress.current == 80
             {
                 split(splits, "twilight_dodge_attic_ninja")
@@ -73,21 +74,24 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_defeat_musashi
-                && scenario_progress.old == 160
+                && scenario_progress.old >= 160
+                && scenario_progress.old < 170
                 && scenario_progress.current == 170
             {
                 split(splits, "twilight_defeat_musashi")
             }
             
             if settings.twilight_defeat_yodogimi
-                && scenario_progress.old == 180
+                && scenario_progress.old >= 180
+                && scenario_progress.old < 190
                 && scenario_progress.current == 190
             {
                 split(splits, "twilight_defeat_yodogimi")
             }
 
             if settings.twilight_defeat_ode_iou
-                && scenario_progress.old == 190
+                && scenario_progress.old >= 190
+                && scenario_progress.old < 200
                 && scenario_progress.current == 200
             {
                 split(splits, "twilight_defeat_ode_iou")

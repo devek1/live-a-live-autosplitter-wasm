@@ -24,19 +24,22 @@ impl Prehistory {
         }
         if current_chapter.current == Chapter::Prehistory as u8 {
             if settings.prehistory_turn_in_meat_to_elder
-                && scenario_progress.old == 70
+                && scenario_progress.old >= 70
+                && scenario_progress.old < 80
                 && scenario_progress.current == 80
             {
                 split(splits, "prehistory_turn_in_meat_to_elder")
             }
             if settings.prehistory_defeat_cavemen
-                && scenario_progress.old == 230
+                && scenario_progress.old >= 230
+                && scenario_progress.old < 240
                 && scenario_progress.current == 240
             {
                 split(splits, "prehistory_defeat_cavemen")
             }
             if settings.prehistory_defeat_zaki_1
-                && scenario_progress.old == 240
+                && scenario_progress.old >= 240
+                && scenario_progress.old < 250
                 && scenario_progress.current == 250
             {
                 split(splits, "prehistory_defeat_zaki_1")
@@ -56,7 +59,8 @@ impl Prehistory {
                 split(splits, "prehistory_defeat_zaki_3")
             }
             if settings.prehistory_defeat_odo
-                && scenario_progress.old == 405
+                && scenario_progress.old >= 405
+                && scenario_progress.old < 410
                 && scenario_progress.current == 410
             {
                 split(splits, "prehistory_defeat_odo")

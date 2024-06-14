@@ -33,13 +33,15 @@ impl NearFuture {
                 split(splits, "near_future_park")
             }
             if settings.near_future_enter_titan
-                && scenario_progress.old == 270
+                && scenario_progress.old >= 270
+                && scenario_progress.old < 280
                 && scenario_progress.current == 280
             {
                 split(splits, "near_future_enter_titan")
             }
             if settings.near_future_dock
-                && scenario_progress.old == 380
+                && scenario_progress.old >= 380
+                && scenario_progress.old < 390
                 && scenario_progress.current == 390
             {
                 split(splits, "near_future_dock")
@@ -52,13 +54,15 @@ impl NearFuture {
                 split(splits, "near_future_matsu_joins")
             }
             if settings.near_future_robot
-                && scenario_progress.old == 460
+                && scenario_progress.old >= 460
+                && scenario_progress.old < 490
                 && scenario_progress.current == 490
             {
                 split(splits, "near_future_robot")
             }
             if settings.near_future_enter_titan_2
-                && scenario_progress.old == 670
+                && scenario_progress.old >= 670
+                && scenario_progress.old < 746
                 && scenario_progress.current == 746
             {
                 split(splits, "near_future_enter_titan_2")
