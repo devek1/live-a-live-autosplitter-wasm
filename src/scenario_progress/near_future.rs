@@ -45,7 +45,8 @@ impl NearFuture {
                 split(splits, "near_future_dock")
             }
             if settings.near_future_matsu_joins
-                && scenario_progress.old == 410
+                && scenario_progress.old >= 410
+                && scenario_progress.old < 450
                 && scenario_progress.current == 450
             {
                 split(splits, "near_future_matsu_joins")
