@@ -6,7 +6,6 @@ use crate::Chapter;
 use crate::ChapterData;
 use asr::watcher::Pair;
 
-
 // Locations
 // 10228295 - outside storehouse
 // 10228695 - Inside Storehouse
@@ -30,7 +29,6 @@ impl TwilightOfEdoJapan {
             split(splits, "start_twilight_of_edo_japan")
         }
         if current_chapter.current == Chapter::TwilightOfEdoJapan as u8 {
-            
             // Put Scenario Splits Here
             if settings.twilight_dodge_attic_ninja
                 && scenario_progress.old >= 70
@@ -51,15 +49,36 @@ impl TwilightOfEdoJapan {
             if settings.twilight_level_5_storehouse_leave
                 && map_id.old == 10228695
                 && map_id.current == 10228295
-                && chapter_data.character_data.clone().into_iter().nth(0).unwrap().level == 5
-                && chapter_data.character_data.clone().into_iter().nth(0).unwrap().exp >= 56
+                && chapter_data
+                    .character_data
+                    .clone()
+                    .into_iter()
+                    .nth(0)
+                    .unwrap()
+                    .level
+                    == 5
+                && chapter_data
+                    .character_data
+                    .clone()
+                    .into_iter()
+                    .nth(0)
+                    .unwrap()
+                    .exp
+                    >= 56
             {
                 split(splits, "twilight_level_5_storehouse")
             }
             if settings.twilight_level_6_storehouse_leave
                 && map_id.old == 10228695
                 && map_id.current == 10228295
-                && chapter_data.character_data.clone().into_iter().nth(0).unwrap().level == 6
+                && chapter_data
+                    .character_data
+                    .clone()
+                    .into_iter()
+                    .nth(0)
+                    .unwrap()
+                    .level
+                    == 6
                 && scenario_progress.current == 120
             {
                 split(splits, "twilight_level_6_storehouse")
@@ -80,7 +99,7 @@ impl TwilightOfEdoJapan {
             {
                 split(splits, "twilight_defeat_musashi")
             }
-            
+
             if settings.twilight_defeat_yodogimi
                 && scenario_progress.old >= 180
                 && scenario_progress.old < 190

@@ -14,8 +14,8 @@ use std::collections::HashSet;
 asr::async_main!(stable);
 
 struct ChapterData {
-  pub character_data: Vec<CharacterData>,
-  pub map_id: GamePointer<u32>,
+    pub character_data: Vec<CharacterData>,
+    pub map_id: GamePointer<u32>,
 }
 
 impl ChapterData {
@@ -28,10 +28,11 @@ impl ChapterData {
 
         let count_addr = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x158];
 
-        let count: Option<u8> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &count_addr) {
-            Ok(val) => Some(val),
-            Err(_e) => Some(0),
-        };
+        let count: Option<u8> =
+            match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &count_addr) {
+                Ok(val) => Some(val),
+                Err(_e) => Some(0),
+            };
 
         const SIZE: u64 = 0xB0;
 
@@ -40,11 +41,12 @@ impl ChapterData {
             let mut data_addr: Vec<u64> = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x150];
 
             data_addr.push(offset);
-            
-            let character_data_struct: Option<CharacterData> = match process.read_pointer_path(module_base, asr::PointerSize::Bit64,  &data_addr) {
-                Ok(val) => Some(val),
-                Err(_e) => None,
-            };
+
+            let character_data_struct: Option<CharacterData> =
+                match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &data_addr) {
+                    Ok(val) => Some(val),
+                    Err(_e) => None,
+                };
             if let Some(val) = character_data_struct {
                 character_data.push(val);
             }
@@ -56,19 +58,18 @@ impl ChapterData {
 #[derive(bytemuck::CheckedBitPattern, Copy, Clone)]
 #[repr(C)]
 struct CharacterData {
-   _tag_name: u64,
-   level: u32,
-   max_hp: u32,
-   physical_attack: u32,
-   physical_defense: u32,
-   special_attack: u32,
-   special_defense: u32,
-   agility: u32,
-   accuracy: u32,
-   evasion: u32,
-   exp: u32
+    _tag_name: u64,
+    level: u32,
+    max_hp: u32,
+    physical_attack: u32,
+    physical_defense: u32,
+    special_attack: u32,
+    special_defense: u32,
+    agility: u32,
+    accuracy: u32,
+    evasion: u32,
+    exp: u32,
 }
-
 
 struct GamePointer<T: Clone> {
     pub address: Vec<u64>,
@@ -85,7 +86,11 @@ impl<T: Clone + bytemuck::Pod> GamePointer<T> {
         }
     }
     pub fn update_value(&mut self, process: &Process) -> Pair<T> {
-        let value: Option<T> = match process.read_pointer_path(self.module_base, asr::PointerSize::Bit64, &self.address) {
+        let value: Option<T> = match process.read_pointer_path(
+            self.module_base,
+            asr::PointerSize::Bit64,
+            &self.address,
+        ) {
             Ok(val) => Some(val),
             Err(_e) => Some(T::zeroed()),
         };
@@ -110,7 +115,7 @@ enum Chapter {
 async fn main() {
     let mut splits = HashSet::<String>::new();
     let mut settings = Settings::register();
-    
+
     loop {
         let process = match asr::get_os().ok().unwrap().as_str() {
             "linux" => Process::wait_attach("LIVEALIVE-Win64").await,
@@ -133,25 +138,74 @@ async fn main() {
             GamePointer::<u8>::new(main_module_base, vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348]);
         let mut scenario_progress_pointer =
             GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
-        let mut loading_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA]);
-        let mut transition_state_pointer =
-            GamePointer::<u32>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x0 + 0x38, 0x0, 0x70, 0x6C]);
+        let mut loading_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
+        );
+        let mut transition_state_pointer = GamePointer::<u32>::new(
+            main_module_base,
+            vec![0x4A2DA88, 0x20, 0x0 + 0x38, 0x0, 0x70, 0x6C],
+        );
 
-        let mut present_day_namkiat_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x318, 0x478]);
-        let mut present_day_aja_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x320, 0x478]);
-        let mut present_day_tula_han_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x328, 0x478]);
-        let mut present_day_moribe_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x330, 0x478]);
-        let mut present_day_max_morgan_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x338, 0x478]);
-        let mut present_day_jackie_defeated_pointer =
-            GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x340, 0x478]);
+        let mut present_day_namkiat_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x318, 0x478,
+            ],
+        );
+        let mut present_day_aja_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x320, 0x478,
+            ],
+        );
+        let mut present_day_tula_han_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x328, 0x478,
+            ],
+        );
+        let mut present_day_moribe_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x330, 0x478,
+            ],
+        );
+        let mut present_day_max_morgan_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x338, 0x478,
+            ],
+        );
+        let mut present_day_jackie_defeated_pointer = GamePointer::<u8>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x340, 0x478,
+            ],
+        );
 
-        let mut chapter_data = ChapterData { character_data: vec![], map_id: GamePointer::<u32>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418]) };
+        let mut chapter_data = ChapterData {
+            character_data: vec![],
+            map_id: GamePointer::<u32>::new(
+                main_module_base,
+                vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418],
+            ),
+        };
+
+        // Frame number value for Sin Odio fight.
+        let mut last_known_position_frame_number_pointer = GamePointer::<u32>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338, 0x1B0, 0xF0, 0x250, 0x438,
+            ],
+        );
+        let mut last_known_position_duration_frames_pointer = GamePointer::<u32>::new(
+            main_module_base,
+            vec![
+                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338, 0x1B0, 0xF0, 0x250, 0x2C4,
+            ],
+        );
+
         // asr::print_message("UPDATING");
         process
             .until_closes(async {
@@ -161,6 +215,9 @@ async fn main() {
                 let mut moribe_defeated = present_day_moribe_defeated_pointer.update_value(&process);
                 let mut max_morgan_defeated = present_day_max_morgan_defeated_pointer.update_value(&process);
                 let mut jackie_defeated = present_day_jackie_defeated_pointer.update_value(&process);
+
+                let mut frame_pointer_value = last_known_position_frame_number_pointer.update_value(&process);
+                let mut duration_frames_value = last_known_position_duration_frames_pointer.update_value(&process);
                 loop {
                     settings.update();
 
@@ -174,6 +231,14 @@ async fn main() {
                         
 
                     chapter_data.update(&process, main_module_base);
+                    
+                    // Sin odio fight completion
+                    if current_chapter.current == Chapter::DominionOfHate as u8 {
+                        frame_pointer_value = last_known_position_frame_number_pointer.update_value(&process);
+                        duration_frames_value = last_known_position_duration_frames_pointer.update_value(&process);
+                        timer::set_variable_int("FPV", frame_pointer_value.current);
+                        timer::set_variable_int("DF", duration_frames_value.current);
+                    }
 
                     if current_chapter.current == Chapter::PresentDay as u8 {
                         namkiat_defeated = present_day_namkiat_defeated_pointer.update_value(&process);
@@ -303,6 +368,9 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &frame_pointer_value,
+                                &duration_frames_value,
                             );
                             
                             if settings.load_removal {

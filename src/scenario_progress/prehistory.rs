@@ -45,14 +45,14 @@ impl Prehistory {
                 split(splits, "prehistory_defeat_zaki_1")
             }
             if settings.prehistory_defeat_zaki_2
-                && scenario_progress.old >= 285 
+                && scenario_progress.old >= 285
                 && scenario_progress.old < 291
                 && scenario_progress.current == 291
             {
                 split(splits, "prehistory_defeat_zaki_2")
             }
             if settings.prehistory_defeat_zaki_3
-                && scenario_progress.old >= 383 
+                && scenario_progress.old >= 383
                 && scenario_progress.old < 405
                 && scenario_progress.current == 405
             {

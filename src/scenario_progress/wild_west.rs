@@ -23,7 +23,6 @@ impl WildWest {
             split(splits, "start_wild_west")
         }
         if current_chapter.current == Chapter::WildWest as u8 {
-
             if settings.wild_west_defeat_mad_dog_intro
                 && scenario_progress.old == 30
                 && scenario_progress.current == 40

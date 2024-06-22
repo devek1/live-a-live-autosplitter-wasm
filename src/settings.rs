@@ -1,5 +1,5 @@
-use asr::settings::Gui;
 use asr::settings::gui::Title;
+use asr::settings::Gui;
 
 #[derive(Gui)]
 enum Category {
@@ -7,7 +7,7 @@ enum Category {
     SingleStory,
     /// Glitchless
     #[default]
-    TrueEnding
+    TrueEnding,
 }
 
 #[derive(Gui)]
@@ -23,6 +23,8 @@ pub struct Settings {
     pub start: bool,
     /// Automatic Start on New Game
     pub new_start: bool,
+    /// Split on Sin Odio Flash
+    pub split_on_sin_odio: bool,
 
     // Full Game Chapter Splits
     full_game_run_chapter_splits: Title,
@@ -106,31 +108,31 @@ pub struct Settings {
     /// Wild West - Intro - Defeat Mad Dog
     pub wild_west_defeat_mad_dog_intro: bool,
     /// Wild West - Defeat Pike
-    pub wild_west_defeat_defeat_pike: bool, 
+    pub wild_west_defeat_defeat_pike: bool,
     /// Wild West - Begin Ambush Phase
-    pub wild_west_begin_ambush_phase: bool, 
+    pub wild_west_begin_ambush_phase: bool,
     /// Wild West - End Ambush Phase
-    pub wild_west_end_ambush_phase: bool, 
+    pub wild_west_end_ambush_phase: bool,
     /// Wild West - Defeat Odie O'Bright
-    pub wild_west_defeat_odie: bool, 
+    pub wild_west_defeat_odie: bool,
     /// Wild West - Last Mad Dog Fight
-    pub wild_west_mad_dog_final: bool, 
+    pub wild_west_mad_dog_final: bool,
     /// Wild West - Chapter Complete
-    pub wild_west_end_split: bool, 
+    pub wild_west_end_split: bool,
 
     prehistory: Title,
     /// Prehistory - Turn in meat to elder
-    pub prehistory_turn_in_meat_to_elder: bool, 
+    pub prehistory_turn_in_meat_to_elder: bool,
     /// Prehistory - Defeat Cavemen
-    pub prehistory_defeat_cavemen: bool, 
+    pub prehistory_defeat_cavemen: bool,
     /// Prehistory - Defeat Zaki 1
-    pub prehistory_defeat_zaki_1: bool, 
+    pub prehistory_defeat_zaki_1: bool,
     /// Prehistory - Defeat Zaki 2
-    pub prehistory_defeat_zaki_2: bool, 
+    pub prehistory_defeat_zaki_2: bool,
     /// Prehistory - Defeat Zaki 3
-    pub prehistory_defeat_zaki_3: bool, 
+    pub prehistory_defeat_zaki_3: bool,
     /// Prehistory - Defeat Odo
-    pub prehistory_defeat_odo: bool, 
+    pub prehistory_defeat_odo: bool,
     /// Prehistory - Chapter Complete
-    pub prehistory_end_split: bool, 
+    pub prehistory_end_split: bool,
 }
