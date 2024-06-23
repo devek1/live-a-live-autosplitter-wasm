@@ -29,9 +29,12 @@
           buildInputs = [
             pkg-config
             wasm-pack
+            rust-analyzer
+            rustfmt
             wasm-bindgen-cli
             (rust-bin.nightly.latest.default.override {
               targets = [ "wasm32-unknown-unknown" ];
+              extensions = ["rust-analyzer"];
             })
           ];
           LD_LIBRARY_PATH = libPath;

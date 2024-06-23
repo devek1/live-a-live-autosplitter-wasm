@@ -135,4 +135,34 @@ pub struct Settings {
     pub prehistory_defeat_odo: bool,
     /// Prehistory - Chapter Complete
     pub prehistory_end_split: bool,
+
+    imperial_china: Title,
+    /// Imperial China - Recruit All Disciples
+    pub imperial_china_recruit_all_disciples: bool,
+    /// Imperial China - Training Complete
+    pub imperial_china_training_complete: bool,
+    /// Imperial China - Defeat Sun Tzu Wang
+    pub imperial_china_defeat_sun_tzu_wang: bool,
+    /// Imperial China - Defeat Temple Guards
+    pub imperial_china_defeat_temple_guards: bool,
+    /// Imperial China - Defeat Courtyard Guards
+    pub imperial_china_defeat_courtyard_guards: bool,
+    /// Imperial China - Defeat Table Guards
+    pub imperial_china_defeat_table_guards: bool,
+    /// Imperial China - G1 Defeat Su Xi / San Xi
+    pub imperial_china_defeat_su_xi_san_xi: bool,
+    /// Imperial China - G2 Defeat Yi Xi / Er Xi
+    pub imperial_china_defeat_yi_xi_er_xi: bool,
+    /// Imperial China - G3 Defeat Tong Cha / Sha Cha
+    pub imperial_china_defeat_tong_cha_sha_cha: bool,
+    /// Imperial China - G4 Defeat Pei Cha / Nan Cha
+    pub imperial_china_defeat_pei_cha_nan_cha: bool,
+    /// Imperial China - G5 Defeat Xian / Lin / Chan
+    pub imperial_china_defeat_xian_lin_chan: bool,
+    /// Imperial China - G6 Defeat Yi Pei Kou
+    pub imperial_china_defeat_yi_pei_kou: bool,
+    /// Imperial China - Defeat Ou Di Wan Li
+    pub imperial_china_defeat_ou_di_wan_li: bool,
+    /// Imperial China - Chapter Complete
+    pub imperial_china_end_split: bool,
 }
