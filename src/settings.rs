@@ -165,4 +165,16 @@ pub struct Settings {
     pub imperial_china_defeat_ou_di_wan_li: bool,
     /// Imperial China - Chapter Complete
     pub imperial_china_end_split: bool,
+
+    pub dominion_of_hate: Title,
+    /// Split on Odio Fight Start
+    pub split_on_enter_odio: bool,
+    /// Split on Pure Odio Transformation
+    pub split_on_odio_face: bool,
+    /// Split on Pure Odio Kill
+    pub split_on_pure_odio: bool,
+    /// Split on Sin Odio Start
+    pub split_on_sin_start: bool,
+    /// Split on Sin Odio Phase 1
+    pub split_on_sin_phase1: bool,
 }
