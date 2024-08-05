@@ -23,6 +23,8 @@ pub struct Settings {
     pub start: bool,
     /// Automatic Start on New Game
     pub new_start: bool,
+    /// Automatic Start on Odio Fight
+    pub start_on_enter_odio: bool,
     /// Split on Sin Odio Flash
     pub split_on_sin_odio: bool,
 

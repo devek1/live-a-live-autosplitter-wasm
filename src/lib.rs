@@ -281,6 +281,19 @@ async fn main() {
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
+                            if current_chapter.current == Chapter::DominionOfHate as u8 {
+                                // Put Scenario Splits Here
+                                if settings.start_on_enter_odio
+                                    && scenario_progress.current == 60
+                                    && duration_frames_value.current == 212
+                                    && frame_pointer_value.old != 0
+                                    && frame_pointer_value.current < 60
+                                {
+									// asr::print_message("Clearing Splits and Starting");
+									splits = HashSet::<String>::new();
+									timer::start();
+                                }
+                            }
                         }
                         TimerState::Running => {
                             // CHAPTER SPLITS
