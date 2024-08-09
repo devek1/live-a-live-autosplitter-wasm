@@ -165,16 +165,51 @@ pub struct Settings {
     pub imperial_china_defeat_ou_di_wan_li: bool,
     /// Imperial China - Chapter Complete
     pub imperial_china_end_split: bool,
+    
+    middle_ages: Title,
+    /// Middle Ages - Exit Castle Town
+    pub middle_ages_streibough_joins: bool,
+    /// Middle Ages - Hasshe picks up Brion
+    pub middle_ages_brion: bool,
+    /// Middle Ages - Defeat The Lord of Dark
+    pub middle_ages_defeat_lord_of_dark: bool,
+    /// Middle Ages - Banished from Lucrece
+    pub middle_ages_banished: bool,
+    /// Middle Ages - Prison Escape
+    pub middle_ages_prison_escape: bool,
+    /// Middle Ages - Defeat Claustrophobia
+    pub middle_ages_defeat_claustrophobia: bool,
+    /// Middle Ages - Defeat Hygrophobia
+    pub middle_ages_defeat_hygrophobia: bool,
+    /// Middle Ages - Defeat Streibough
+    pub middle_ages_defeat_streibough: bool,
+    /// Middle Ages - Chapter Complete
+    pub middle_ages_end_split: bool,
 
-    pub dominion_of_hate: Title,
+    dominion_of_hate: Title,
+    /// Dominion of Hate - Start as non-Oersted protagonist
+    pub dominion_start_not_oersted: bool,
+    /// Dominion of Hate - Enter Archon's Roost
+    pub dominion_enter_roost: bool,
     /// Dominion of Hate - Enter Odio Fight
-    pub split_on_enter_odio: bool,
+    pub dominion_enter_odio: bool,
     /// Dominion of Hate - Defeat Odio Face
-    pub split_on_odio_face: bool,
+    pub dominion_defeat_odio_face: bool,
     ///Dominion of Hate - Defeat Pure Odio
-    pub split_on_pure_odio: bool,
+    pub dominion_defeat_odio: bool,
     /// Dominion of Hate - Enter Sin Odio
-    pub split_on_sin_start: bool,
+    pub dominion_enter_sin_fight: bool,
     /// Dominion of Hate - End Sin Odio Phase 1
-    pub split_on_sin_phase1: bool,
+    pub dominion_end_sin_phase1: bool,
+    
+    /// Dominion of Hate (Oersted)
+    dominion_of_hate_oersted: Title,
+    /// Dominion of Hate - Start as Oersted
+    pub dominion_oersted_start: bool,
+    /// Dominion of Hate (Oersted) - Split on defeating Steel Titan
+    pub dominion_oersted_defeat_steel_titan: bool,
+    /// Dominion of Hate (Oersted) - Split on Sad Ending
+    pub dominion_oersted_get_revenge: bool,
+    /// Dominion of Hate (Oersted) - Split on Armageddon Ending
+    pub dominion_oersted_armageddon: bool,
 }

@@ -363,6 +363,8 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &transition_state,
                             );
 
                             scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(
