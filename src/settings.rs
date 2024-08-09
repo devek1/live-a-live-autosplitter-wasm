@@ -167,14 +167,14 @@ pub struct Settings {
     pub imperial_china_end_split: bool,
 
     pub dominion_of_hate: Title,
-    /// Split on Odio Fight Start
+    /// Dominion of Hate - Enter Odio Fight
     pub split_on_enter_odio: bool,
-    /// Split on Pure Odio Transformation
+    /// Dominion of Hate - Defeat Odio Face
     pub split_on_odio_face: bool,
-    /// Split on Pure Odio Kill
+    ///Dominion of Hate - Defeat Pure Odio
     pub split_on_pure_odio: bool,
-    /// Split on Sin Odio Start
+    /// Dominion of Hate - Enter Sin Odio
     pub split_on_sin_start: bool,
-    /// Split on Sin Odio Phase 1
+    /// Dominion of Hate - End Sin Odio Phase 1
     pub split_on_sin_phase1: bool,
 }
