@@ -14,6 +14,8 @@ impl MiddleAges {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
+        frame_pointer_value: &Pair<u32>,
+        duration_frames_value: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_middle_ages
@@ -30,15 +32,37 @@ impl MiddleAges {
             {
                 split(splits, "middle_ages_streibough_joins")
             }
-            if settings.middle_ages_brion
-                && scenario_progress.current == 140
-                && scenario_progress.old < 140
+            if settings.middle_ages_hasshe_house_1
+                && scenario_progress.current == 100
+                && scenario_progress.old < 100
             {
-                split(splits, "middle_ages_brion")
+                split(splits, "middle_ages_hasshe_house_1")
+            }
+            if settings.middle_ages_uranus_joins
+                && scenario_progress.current == 110
+                && scenario_progress.old < 110
+            {
+                split(splits, "middle_ages_uranus_joins")
+            }
+            if settings.middle_ages_hasshe_joins
+                && scenario_progress.current == 130
+                && scenario_progress.old < 130
+            {
+                split(splits, "middle_ages_hasshe_joins")
+            }
+            if settings.middle_ages_archons_roost_1
+                && scenario_progress.current == 150
+                && duration_frames_value.current == 122
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
+            {
+                split(splits, "middle_ages_archons_roost_1")
             }
             if settings.middle_ages_defeat_lord_of_dark
-                && scenario_progress.current == 160
-                && scenario_progress.old < 160
+                && scenario_progress.current == 150
+                && duration_frames_value.current == 347
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
             {
                 split(splits, "middle_ages_defeat_lord_of_dark")
             }
@@ -48,6 +72,12 @@ impl MiddleAges {
             {
                 split(splits, "middle_ages_banished")
             }
+            if settings.middle_ages_arrested
+                && scenario_progress.current == 270
+                && scenario_progress.old < 270
+            {
+                split(splits, "middle_ages_arrested")
+            }
             if settings.middle_ages_prison_escape
                 && scenario_progress.current == 360
                 && scenario_progress.old < 360
@@ -55,20 +85,42 @@ impl MiddleAges {
                 split(splits, "middle_ages_prison_escape")
             }
             if settings.middle_ages_defeat_claustrophobia
-                && scenario_progress.current == 370
-                && scenario_progress.old < 370
+                && scenario_progress.current == 360
+                && duration_frames_value.current == 180
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
             {
                 split(splits, "middle_ages_defeat_claustrophobia")
             }
+            if settings.middle_ages_defeat_scotophobia
+                && scenario_progress.current == 370
+                && duration_frames_value.current == 180
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
+            {
+                split(splits, "middle_ages_defeat_scotophobia")
+            }
+            if settings.middle_ages_defeat_acrophobia
+                && scenario_progress.current == 380
+                && duration_frames_value.current == 180
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
+            {
+                split(splits, "middle_ages_defeat_acrophobia")
+            }
             if settings.middle_ages_defeat_hygrophobia
-                && scenario_progress.current == 395
-                && scenario_progress.old < 395
+                && scenario_progress.current == 390
+                && duration_frames_value.current == 180
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
             {
                 split(splits, "middle_ages_defeat_hygrophobia")
             }
             if settings.middle_ages_defeat_streibough
-                && scenario_progress.current == 430
-                && scenario_progress.old < 430
+                && scenario_progress.current == 420
+                && duration_frames_value.current == 360
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
             {
                 split(splits, "middle_ages_defeat_streibough")
             }
