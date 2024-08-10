@@ -231,14 +231,6 @@ async fn main() {
                         
 
                     chapter_data.update(&process, main_module_base);
-                    
-                    // Sin odio fight completion
-                    if current_chapter.current == Chapter::DominionOfHate as u8 {
-                        frame_pointer_value = last_known_position_frame_number_pointer.update_value(&process);
-                        duration_frames_value = last_known_position_duration_frames_pointer.update_value(&process);
-                        timer::set_variable_int("FPV", frame_pointer_value.current);
-                        timer::set_variable_int("DF", duration_frames_value.current);
-                    }
 
                     if current_chapter.current == Chapter::PresentDay as u8 {
                         namkiat_defeated = present_day_namkiat_defeated_pointer.update_value(&process);
@@ -262,6 +254,8 @@ async fn main() {
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
                         timer::set_variable_int("Map ID", map_id.current);
                         timer::set_variable_int("Transition State", transition_state.current);
+                        timer::set_variable_int("FPV", frame_pointer_value.current);
+                        timer::set_variable_int("DF", duration_frames_value.current);
                         for (i, character) in chapter_data.character_data.clone().iter().enumerate() {
                             timer::set_variable_int(&format!("Character {} Level:", i), character.level);
                             timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
@@ -365,6 +359,8 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                &frame_pointer_value,
+                                &duration_frames_value,
                             );
 
                             scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(

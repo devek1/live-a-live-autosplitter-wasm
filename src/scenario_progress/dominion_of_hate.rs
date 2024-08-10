@@ -53,11 +53,19 @@ impl DominionOfHate {
             {
                 split(splits, "dominion_defeat_odio_face")
             }
-            if settings.dominion_defeat_odio
-                && scenario_progress.current == 70
-                && scenario_progress.old < 70
+            if settings.dominion_defeat_pure_odio
+                && scenario_progress.current == 60
+                && duration_frames_value.current == 368
+                && frame_pointer_value.old != 0
+                && frame_pointer_value.current < 60
             {
-                split(splits, "dominion_defeat_odio")
+                split(splits, "dominion_defeat_pure_odio")
+            }
+            if settings.dominion_defeat_odio_fade
+                && scenario_progress.old < 70
+                && scenario_progress.current == 70
+            {
+                split(splits, "dominion_defeat_odio_fade")
             }
             if settings.dominion_enter_sin_fight
                 && scenario_progress.current == 110

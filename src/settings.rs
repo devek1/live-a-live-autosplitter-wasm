@@ -169,16 +169,28 @@ pub struct Settings {
     middle_ages: Title,
     /// Middle Ages - Exit Castle Town
     pub middle_ages_streibough_joins: bool,
-    /// Middle Ages - Hasshe picks up Brion
-    pub middle_ages_brion: bool,
+    /// Middle Ages - Visit Hasshe
+    pub middle_ages_hasshe_house_1: bool,
+    /// Middle Ages - Uranus Joins
+    pub middle_ages_uranus_joins: bool,
+    /// Middle Ages - Hasshe Joins
+    pub middle_ages_hasshe_joins: bool,
+    /// Middle Ages - Confront The Lord of Dark
+    pub middle_ages_archons_roost_1: bool,
     /// Middle Ages - Defeat The Lord of Dark
     pub middle_ages_defeat_lord_of_dark: bool,
     /// Middle Ages - Banished from Lucrece
     pub middle_ages_banished: bool,
+    /// Middle Ages - Arrested
+    pub middle_ages_arrested: bool,
     /// Middle Ages - Prison Escape
     pub middle_ages_prison_escape: bool,
     /// Middle Ages - Defeat Claustrophobia
     pub middle_ages_defeat_claustrophobia: bool,
+    /// Middle Ages - Defeat Scotophobia
+    pub middle_ages_defeat_scotophobia: bool,
+    /// Middle Ages - Defeat Acrophobia
+    pub middle_ages_defeat_acrophobia: bool,
     /// Middle Ages - Defeat Hygrophobia
     pub middle_ages_defeat_hygrophobia: bool,
     /// Middle Ages - Defeat Streibough
@@ -196,7 +208,9 @@ pub struct Settings {
     /// Dominion of Hate - Defeat Odio Face
     pub dominion_defeat_odio_face: bool,
     ///Dominion of Hate - Defeat Pure Odio
-    pub dominion_defeat_odio: bool,
+    pub dominion_defeat_pure_odio: bool,
+    ///Dominion of Hate - Complete Odio Fight (fade back to cutscene)
+    pub dominion_defeat_odio_fade: bool,
     /// Dominion of Hate - Enter Sin Odio
     pub dominion_enter_sin_fight: bool,
     /// Dominion of Hate - End Sin Odio Phase 1
