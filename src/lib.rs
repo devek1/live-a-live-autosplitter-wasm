@@ -147,43 +147,6 @@ async fn main() {
             vec![0x4A2DA88, 0x20, 0x0 + 0x38, 0x0, 0x70, 0x6C],
         );
 
-        let mut present_day_namkiat_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x318, 0x478,
-            ],
-        );
-        let mut present_day_aja_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x320, 0x478,
-            ],
-        );
-        let mut present_day_tula_han_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x328, 0x478,
-            ],
-        );
-        let mut present_day_moribe_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x330, 0x478,
-            ],
-        );
-        let mut present_day_max_morgan_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x338, 0x478,
-            ],
-        );
-        let mut present_day_jackie_defeated_pointer = GamePointer::<u8>::new(
-            main_module_base,
-            vec![
-                0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x3F8, 0x238, 0x430, 0x340, 0x478,
-            ],
-        );
-
         let mut chapter_data = ChapterData {
             character_data: vec![],
             map_id: GamePointer::<u32>::new(
@@ -209,12 +172,7 @@ async fn main() {
         // asr::print_message("UPDATING");
         process
             .until_closes(async {
-                let mut namkiat_defeated = present_day_namkiat_defeated_pointer.update_value(&process);
-                let mut aja_defeated = present_day_aja_defeated_pointer.update_value(&process);
-                let mut tula_han_defeated = present_day_tula_han_defeated_pointer.update_value(&process);
-                let mut moribe_defeated = present_day_moribe_defeated_pointer.update_value(&process);
-                let mut max_morgan_defeated = present_day_max_morgan_defeated_pointer.update_value(&process);
-                let mut jackie_defeated = present_day_jackie_defeated_pointer.update_value(&process);
+                let mut martial_artists_defeated = (0u8, 0u8);
                 loop {
                     settings.update();
 
@@ -233,19 +191,13 @@ async fn main() {
                     chapter_data.update(&process, main_module_base);
 
                     if current_chapter.current == Chapter::PresentDay as u8 {
-                        namkiat_defeated = present_day_namkiat_defeated_pointer.update_value(&process);
-                        aja_defeated = present_day_aja_defeated_pointer.update_value(&process);
-                        tula_han_defeated = present_day_tula_han_defeated_pointer.update_value(&process);
-                        moribe_defeated = present_day_moribe_defeated_pointer.update_value(&process);
-                        max_morgan_defeated = present_day_max_morgan_defeated_pointer.update_value(&process);
-                        jackie_defeated = present_day_jackie_defeated_pointer.update_value(&process);
-                        timer::set_variable_int("Namkiat defeated", namkiat_defeated.current);
-                        timer::set_variable_int("Aja defeated", aja_defeated.current);
-                        timer::set_variable_int("Tula Han defeated", tula_han_defeated.current);
-                        timer::set_variable_int("Moribe defeated", moribe_defeated.current);
-                        timer::set_variable_int("Max Morgan defeated", max_morgan_defeated.current);
-                        timer::set_variable_int("Jackie defeated", jackie_defeated.current);
-
+                        if duration_frames_value.current == 180 &&
+                            duration_frames_value.old == 0 
+                        {
+                            martial_artists_defeated.1 = martial_artists_defeated.0;
+                            martial_artists_defeated.0 += 1u8;
+                        }
+                        timer::set_variable_int("Martial artists defeated", martial_artists_defeated.0)
                     }
 
                     // #[cfg(debug_assertions)]
@@ -269,6 +221,7 @@ async fn main() {
                                 && current_chapter.current != Chapter::Menu as u8
                             {
                                 // asr::print_message("Clearing Splits and Starting");
+                                martial_artists_defeated = (0u8,0u8);
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
@@ -278,6 +231,7 @@ async fn main() {
                                 && new_game_start.current > 0
                             {
                                 // asr::print_message("Clearing Splits and Starting");
+                                martial_artists_defeated = (0u8,0u8);
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
@@ -325,12 +279,8 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
-                                &namkiat_defeated,
-                                &aja_defeated,
-                                &tula_han_defeated,
-                                &moribe_defeated,
-                                &max_morgan_defeated,
-                                &jackie_defeated,
+                                martial_artists_defeated,
+                                &duration_frames_value,
                             );
     
                             scenario_progress::near_future::NearFuture::maybe_split(

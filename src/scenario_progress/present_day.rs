@@ -14,12 +14,8 @@ impl PresentDay {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
-        namkiat_defeated: &Pair<u8>,
-        aja_defeated: &Pair<u8>,
-        tula_han_defeated: &Pair<u8>,
-        moribe_defeated: &Pair<u8>,
-        max_morgan_defeated: &Pair<u8>,
-        jackie_defeated: &Pair<u8>,
+        martial_artists_defeated: (u8, u8),
+        duration_frames_value: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_present_day
@@ -29,47 +25,47 @@ impl PresentDay {
             split(splits, "start_present_day")
         }
         if current_chapter.current == Chapter::PresentDay as u8 {
-            if settings.present_day_moribe_defeated
-                && moribe_defeated.old == 0
-                && moribe_defeated.current == 1
+            if settings.present_day_defeated_1
+                && martial_artists_defeated.1 == 0
+                && martial_artists_defeated.0 == 1
             {
-                split(splits, "present_day_moribe_defeated_split")
+                split(splits, "present_day_defeated_1")
             }
-            if settings.present_day_max_morgan_defeated
-                && max_morgan_defeated.old == 0
-                && max_morgan_defeated.current == 1
+            if settings.present_day_defeated_2
+                && martial_artists_defeated.1 == 1
+                && martial_artists_defeated.0 == 2
             {
-                split(splits, "present_day_max_morgan_defeated_split")
+                split(splits, "present_day_defeated_2")
             }
-            if settings.present_day_jackie_defeated
-                && jackie_defeated.old == 0
-                && jackie_defeated.current == 1
+            if settings.present_day_defeated_3
+                && martial_artists_defeated.1 == 2
+                && martial_artists_defeated.0 == 3
             {
-                split(splits, "present_day_jackie_defeated_split")
+                split(splits, "present_day_defeated_3")
             }
-            if settings.present_day_namkiat_defeated
-                && namkiat_defeated.old == 0
-                && namkiat_defeated.current == 1
+            if settings.present_day_defeated_4
+                && martial_artists_defeated.1 == 3
+                && martial_artists_defeated.0 == 4
             {
-                split(splits, "present_day_namkiat_defeated_split")
+                split(splits, "present_day_defeated_4")
             }
-            if settings.present_day_aja_defeated
-                && aja_defeated.old == 0
-                && aja_defeated.current == 1
+            if settings.present_day_defeated_5
+                && martial_artists_defeated.1 == 4
+                && martial_artists_defeated.0 == 5
             {
-                split(splits, "present_day_aja_defeated_split")
+                split(splits, "present_day_defeated_5")
             }
-            if settings.present_day_tula_han_defeated
-                && tula_han_defeated.old == 0
-                && tula_han_defeated.current == 1
+            if settings.present_day_defeated_all
+                && martial_artists_defeated.1 == 5
+                && martial_artists_defeated.0 == 6
             {
-                split(splits, "present_day_tula_han_defeated_split")
+                split(splits, "present_day_defeated_all")
             }
-            if settings.present_day_start_odie
-                && map_id.old == 10228626
-                && map_id.current == 10228592
+            if settings.present_day_defeat_odie
+                && duration_frames_value.current == 360
+                && duration_frames_value.old == 0
             {
-                split(splits, "present_day_start_odie_split")
+                split(splits, "present_day_defeat_odie")
             }
             if settings.present_day_end_split
                 && scenario_progress.current == 0
