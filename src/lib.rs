@@ -215,9 +215,6 @@ async fn main() {
                 let mut moribe_defeated = present_day_moribe_defeated_pointer.update_value(&process);
                 let mut max_morgan_defeated = present_day_max_morgan_defeated_pointer.update_value(&process);
                 let mut jackie_defeated = present_day_jackie_defeated_pointer.update_value(&process);
-
-                let mut frame_pointer_value = last_known_position_frame_number_pointer.update_value(&process);
-                let mut duration_frames_value = last_known_position_duration_frames_pointer.update_value(&process);
                 loop {
                     settings.update();
 
@@ -228,6 +225,9 @@ async fn main() {
                     let map_id = chapter_data.map_id.update_value(&process);
 
                     let transition_state = transition_state_pointer.update_value(&process);
+
+                    let frame_pointer_value = last_known_position_frame_number_pointer.update_value(&process);
+                    let duration_frames_value = last_known_position_duration_frames_pointer.update_value(&process);
                         
 
                     chapter_data.update(&process, main_module_base);
