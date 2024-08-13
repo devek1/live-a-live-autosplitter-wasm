@@ -309,7 +309,6 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
-                                &frame_pointer_value,
                                 &duration_frames_value,
                             );
 

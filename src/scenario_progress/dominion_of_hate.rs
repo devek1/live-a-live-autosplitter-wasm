@@ -40,24 +40,21 @@ impl DominionOfHate {
             if settings.dominion_enter_odio
                 && scenario_progress.current == 60
                 && duration_frames_value.current == 212
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_enter_odio")
             }
             if settings.dominion_defeat_odio_face
                 && scenario_progress.current == 60
                 && duration_frames_value.current == 637
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_defeat_odio_face")
             }
             if settings.dominion_defeat_pure_odio
                 && scenario_progress.current == 60
                 && duration_frames_value.current == 368
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_defeat_pure_odio")
             }
@@ -70,22 +67,19 @@ impl DominionOfHate {
             if settings.dominion_enter_sin_fight
                 && scenario_progress.current == 110
                 && duration_frames_value.current == 270
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_enter_sin_fight")
             }
             if settings.dominion_end_sin_phase1
                 && scenario_progress.current == 110
                 && duration_frames_value.current == 330
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_end_sin_phase1")
             }
             if settings.split_on_sin_odio
                 && scenario_progress.current == 110
-                //&& map_id.current == 10237032
                 && duration_frames_value.current == 705
                 && frame_pointer_value.old != 0
                 && frame_pointer_value.current < 60
@@ -101,16 +95,14 @@ impl DominionOfHate {
             if settings.dominion_oersted_defeat_steel_titan
                 && scenario_progress.current == 1010
                 && duration_frames_value.current == 347
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_oersted_defeat_steel_titan")
             }
             if settings.dominion_oersted_armageddon
                 && scenario_progress.current == 1010
                 && duration_frames_value.current == 321
-                && frame_pointer_value.old != 0
-                && frame_pointer_value.current < 60
+                && duration_frames_value.old == 0
             {
                 split(splits, "dominion_oersted_armageddon")
             }
