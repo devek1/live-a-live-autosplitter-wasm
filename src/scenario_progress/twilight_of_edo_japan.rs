@@ -47,8 +47,7 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_level_5_storehouse_leave
-                && map_id.old == 10228695
-                && map_id.current == 10228295
+                && map_id.old - map_id.current == 400 
                 && chapter_data
                     .character_data
                     .clone()
@@ -69,8 +68,7 @@ impl TwilightOfEdoJapan {
                 split(splits, "twilight_level_5_storehouse")
             }
             if settings.twilight_level_6_storehouse_leave
-                && map_id.old == 10228695
-                && map_id.current == 10228295
+                && map_id.old - map_id.current == 400
                 && chapter_data
                     .character_data
                     .clone()
