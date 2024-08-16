@@ -87,22 +87,20 @@ pub struct Settings {
     pub twilight_end_split: bool,
 
     present_day: Title,
-    #[heading_level = 2]
-    last_fight_before_odie_will_not_trigger: Title,
-    // Present Day - Moribe Defeated
-    pub present_day_moribe_defeated: bool,
-    // Present Day - Max Morgan Defeated
-    pub present_day_max_morgan_defeated: bool,
-    // Present Day - Jackie Defeated
-    pub present_day_jackie_defeated: bool,
-    // Present Day - Namkiat Defeated
-    pub present_day_namkiat_defeated: bool,
-    // Present Day - Aja Defeated
-    pub present_day_aja_defeated: bool,
-    // Present Day - Tula Han Defeated
-    pub present_day_tula_han_defeated: bool,
-    // Present Day - Start Odie Fight
-    pub present_day_start_odie: bool,
+    // Present Day - Defeat 1 martial artist
+    pub present_day_defeated_1: bool,
+    // Present Day - Defeat 2 martial artists
+    pub present_day_defeated_2: bool,
+    // Present Day - Defeat 3 martial artists
+    pub present_day_defeated_3: bool,
+    // Present Day - Defeat 4 martial artists
+    pub present_day_defeated_4: bool,
+    // Present Day - Defeat 5 martial artists
+    pub present_day_defeated_5: bool,
+    // Present Day - Defeat all martial artists
+    pub present_day_defeated_all: bool,
+    // Present Day - Defeat Odie
+    pub present_day_defeat_odie: bool,
     // Present Day - Chapter Complete
     pub present_day_end_split: bool,
 
