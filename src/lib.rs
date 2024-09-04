@@ -253,6 +253,9 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
+                                &map_id,
+                                &transition_state,
+                                &duration_frames_value,
                             );
 
                             scenario_progress::imperial_china::ImperialChina::maybe_split(

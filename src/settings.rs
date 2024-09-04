@@ -63,6 +63,14 @@ pub struct Settings {
     pub near_future_enter_titan_2: bool,
     // Near Future - Chapter Complete
     pub near_future_end_split: bool,
+    
+    distant_future: Title,
+    /// Distant Future - Confront OD-10
+    pub distant_future_confront_od10: bool,
+    /// Distant Future - Defeat OD-10
+    pub distant_future_defeat_od10: bool,
+    /// Distant Future - Chapter Complete
+    pub distant_future_end_split: bool,
 
     twilight_of_edo_japan: Title,
     /// Edo Japan - After Dodging Attic Ninja
