@@ -65,7 +65,7 @@ impl TwilightOfEdoJapan {
                     .exp
                     >= 56
             {
-                split(splits, "twilight_level_5_storehouse")
+                split(splits, "twilight_level_5_storehouse_leave")
             }
             if settings.twilight_level_6_storehouse_leave
                 && map_id.old - map_id.current == 400
@@ -77,9 +77,8 @@ impl TwilightOfEdoJapan {
                     .unwrap()
                     .level
                     == 6
-                && scenario_progress.current == 120
             {
-                split(splits, "twilight_level_6_storehouse")
+                split(splits, "twilight_level_6_storehouse_leave")
             }
 
             if settings.twilight_defeat_monks
