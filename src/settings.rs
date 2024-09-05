@@ -217,6 +217,10 @@ pub struct Settings {
     pub dominion_defeat_pure_odio: bool,
     ///Dominion of Hate - Complete Odio Fight (fade back to cutscene)
     pub dominion_defeat_odio_fade: bool,
+    /// Dominion of Hate - Complete Never Ending
+    pub dominion_never_end: bool,
+    /// Dominion of Hate - Complete Good Ending (not Best Ending)
+    pub dominion_incomplete_destiny: bool,
     /// Dominion of Hate - Enter Sin Odio
     pub dominion_enter_sin_fight: bool,
     /// Dominion of Hate - End Sin Odio Phase 1
@@ -229,7 +233,7 @@ pub struct Settings {
     /// Dominion of Hate (Oersted) - Split on defeating Steel Titan
     pub dominion_oersted_defeat_steel_titan: bool,
     /// Dominion of Hate (Oersted) - Split on Sad Ending
-    pub dominion_oersted_get_revenge: bool,
+    pub dominion_oersted_sad_ending: bool,
     /// Dominion of Hate (Oersted) - Split on Armageddon Ending
     pub dominion_oersted_armageddon: bool,
 }

@@ -12,7 +12,8 @@ impl DominionOfHate {
         splits: &mut HashSet<String>,
         current_chapter: &Pair<u8>,
         scenario_progress: &Pair<u16>,
-        _map_id: &Pair<u32>,
+        map_id: &Pair<u32>,
+        transition_state: &Pair<u32>,
         frame_pointer_value: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
     ) {
@@ -64,6 +65,22 @@ impl DominionOfHate {
             {
                 split(splits, "dominion_defeat_odio_fade")
             }
+            if settings.dominion_never_end
+                && scenario_progress.current == 80
+                && map_id.current == 0
+                && transition_state.old == 4
+                && transition_state.current == 0
+            {
+                split(splits, "dominion_never_end")
+            }
+            if settings.dominion_incomplete_destiny
+                && scenario_progress.current == 110
+                && map_id.current == 0
+                && transition_state.old == 4
+                && transition_state.current == 0
+            {
+                split(splits, "dominion_incomplete_destiny")
+            }
             if settings.dominion_enter_sin_fight
                 && scenario_progress.current == 110
                 && duration_frames_value.current == 270
@@ -106,11 +123,13 @@ impl DominionOfHate {
             {
                 split(splits, "dominion_oersted_armageddon")
             }
-            if settings.dominion_oersted_get_revenge 
-                && scenario_progress.current == 1020
-                && scenario_progress.old < 1020
+            if settings.dominion_oersted_sad_ending 
+                && scenario_progress.current == 1130
+                && map_id.current == 0
+                && transition_state.old == 4
+                && transition_state.current == 0
             {
-                split(splits, "dominion_oersted_get_revenge")
+                split(splits, "dominion_oersted_sad_ending")
             } 
         }
     }
