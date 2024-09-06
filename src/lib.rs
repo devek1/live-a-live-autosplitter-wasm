@@ -172,7 +172,7 @@ async fn main() {
         // asr::print_message("UPDATING");
         process
             .until_closes(async {
-                let mut martial_artists_defeated = (0u8, 0u8);
+                let mut bosses_defeated = (0u8, 0u8);
                 loop {
                     settings.update();
 
@@ -190,14 +190,40 @@ async fn main() {
 
                     chapter_data.update(&process, main_module_base);
 
-                    if current_chapter.current == Chapter::PresentDay as u8 {
-                        if duration_frames_value.current == 180 &&
-                            duration_frames_value.old == 0 
+                    if current_chapter.current == Chapter::ImperialChina as u8 {
+                        if scenario_progress.current >= 521
+                            && scenario_progress.current < 531 //only run the following checks if you are in the gauntlet (and before Yi Pei Kou)
                         {
-                            martial_artists_defeated.1 = martial_artists_defeated.0;
-                            martial_artists_defeated.0 += 1u8;
+                            if scenario_progress.old <= 520 //set counter to 0 at the start of the gauntlet
+                            {
+                                bosses_defeated.1 = bosses_defeated.0;
+                                bosses_defeated.0 = 0u8;
+                            }
+                            if duration_frames_value.current == 180
+                                && duration_frames_value.old == 0 
+                            {
+                                bosses_defeated.1 = bosses_defeated.0;
+                                bosses_defeated.0 += 1u8;
+                            } 
+                            if (duration_frames_value.current == 200
+                                && duration_frames_value.old == 0) //resets count on game over
+                                || scenario_progress.current > scenario_progress.old //resets count between fights
+                            {
+                                bosses_defeated.1 = bosses_defeated.0;
+                                bosses_defeated.0 = 0u8;
+                            }
                         }
-                        timer::set_variable_int("Martial artists defeated", martial_artists_defeated.0)
+                        timer::set_variable_int("Boss defeat animations", bosses_defeated.0)
+                    }
+
+                    if current_chapter.current == Chapter::PresentDay as u8 {
+                        if duration_frames_value.current == 180
+                            && duration_frames_value.old == 0 
+                        {
+                            bosses_defeated.1 = bosses_defeated.0;
+                            bosses_defeated.0 += 1u8;
+                        }
+                        timer::set_variable_int("Martial artists defeated", bosses_defeated.0)
                     }
 
                     // #[cfg(debug_assertions)]
@@ -221,7 +247,7 @@ async fn main() {
                                 && current_chapter.current != Chapter::Menu as u8
                             {
                                 // asr::print_message("Clearing Splits and Starting");
-                                martial_artists_defeated = (0u8,0u8);
+                                bosses_defeated = (0u8, 0u8);
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
@@ -231,7 +257,7 @@ async fn main() {
                                 && new_game_start.current > 0
                             {
                                 // asr::print_message("Clearing Splits and Starting");
-                                martial_artists_defeated = (0u8,0u8);
+                                bosses_defeated = (0u8, 0u8);
                                 splits = HashSet::<String>::new();
                                 timer::start();
                             }
@@ -266,6 +292,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                bosses_defeated,
                                 &duration_frames_value,
                             );
                             
@@ -285,7 +312,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
-                                martial_artists_defeated,
+                                bosses_defeated,
                                 &duration_frames_value,
                             );
     
