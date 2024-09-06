@@ -221,8 +221,8 @@ pub struct Settings {
     pub dominion_defeat_odio_face: bool,
     ///Dominion of Hate - Defeat Pure Odio
     pub dominion_defeat_pure_odio: bool,
-    ///Dominion of Hate - Complete Odio Fight (fade back to cutscene)
-    pub dominion_defeat_odio_fade: bool,
+    ///Dominion of Hate - Perform Pure Odio Skip (kill all 4 face pieces)
+    pub dominion_pure_odio_skip: bool,
     /// Dominion of Hate - Complete Never Ending
     pub dominion_never_end: bool,
     /// Dominion of Hate - Complete Good Ending (not Best Ending)

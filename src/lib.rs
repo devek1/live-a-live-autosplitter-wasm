@@ -173,6 +173,7 @@ async fn main() {
         process
             .until_closes(async {
                 let mut bosses_defeated = (0u8, 0u8);
+                let mut in_odio_fight = false;
                 loop {
                     settings.update();
 
@@ -217,6 +218,11 @@ async fn main() {
                     }
 
                     if current_chapter.current == Chapter::PresentDay as u8 {
+                        if current_chapter.old != Chapter::PresentDay as u8 //reset count on entering chapter
+                        {
+                            bosses_defeated.1 = bosses_defeated.0;
+                            bosses_defeated.0 = 0u8;
+                        }
                         if duration_frames_value.current == 180
                             && duration_frames_value.old == 0 
                         {
@@ -224,6 +230,35 @@ async fn main() {
                             bosses_defeated.0 += 1u8;
                         }
                         timer::set_variable_int("Martial artists defeated", bosses_defeated.0)
+                    }
+
+                    if current_chapter.current == Chapter::DominionOfHate as u8
+                        && settings.dominion_pure_odio_skip
+                    {
+                        if scenario_progress.current == 60 //only do the following checks if Odio has appeared and hasn't been defeated yet
+                        {
+                            if duration_frames_value.current == 212 //count starts and resets on entering Odio fight
+                                && duration_frames_value.old == 0 
+                            {
+                                bosses_defeated.1 = bosses_defeated.0;
+                                bosses_defeated.0 = 0u8;
+                                in_odio_fight = true;
+                            }
+                            if in_odio_fight
+                                && duration_frames_value.current == 180
+                                && duration_frames_value.old == 0
+                            {
+                                bosses_defeated.1 = bosses_defeated.0;
+                                bosses_defeated.0 += 1u8;
+                            }
+                        }
+                        if scenario_progress.old == 60 
+                            && scenario_progress.current > 60 //stop count when you either win the fight, or die and see Armageddon
+                        {
+                            in_odio_fight = false;
+                        }
+                        timer::set_variable_int("Boss defeat animations", bosses_defeated.0);
+                        timer::set_variable("In Odio Fight", &bool::to_string(&in_odio_fight))
                     }
 
                     // #[cfg(debug_assertions)]
@@ -354,6 +389,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                bosses_defeated,
                                 &frame_pointer_value,
                                 &duration_frames_value,
                             );

@@ -14,6 +14,7 @@ impl DominionOfHate {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
+        bosses_defeated: (u8, u8),
         frame_pointer_value: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
     ) {
@@ -59,11 +60,12 @@ impl DominionOfHate {
             {
                 split(splits, "dominion_defeat_pure_odio")
             }
-            if settings.dominion_defeat_odio_fade
-                && scenario_progress.old < 70
-                && scenario_progress.current == 70
+            if settings.dominion_pure_odio_skip
+                && scenario_progress.current == 60
+                && bosses_defeated.0 == 4
+                && bosses_defeated.1 < 4
             {
-                split(splits, "dominion_defeat_odio_fade")
+                split(splits, "dominion_pure_odio_skip")
             }
             if settings.dominion_never_end
                 && scenario_progress.current == 80
