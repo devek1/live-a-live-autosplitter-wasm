@@ -14,6 +14,7 @@ impl WildWest {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
+        duration_frames_value: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_wild_west
@@ -49,8 +50,9 @@ impl WildWest {
                 split(splits, "wild_west_end_ambush_phase_split")
             }
             if settings.wild_west_defeat_odie
-                && scenario_progress.old == 200
-                && scenario_progress.current == 210
+                && scenario_progress.current == 200
+                && duration_frames_value.current == 360
+                && duration_frames_value.old == 0
             {
                 split(splits, "wild_west_defeat_odie")
             }

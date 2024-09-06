@@ -14,6 +14,7 @@ impl ImperialChina {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
+        duration_frames_value: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_imperial_china
@@ -103,18 +104,18 @@ impl ImperialChina {
                 split(splits, "imperial_china_defeat_xian_lin_chan")
             }
             if settings.imperial_china_defeat_yi_pei_kou
-                && scenario_progress.old >= 531
-                && scenario_progress.old < 532
-                && scenario_progress.current == 532
+                && scenario_progress.current == 531
+                && duration_frames_value.current == 180
+                && duration_frames_value.old == 0
             {
                 split(splits, "imperial_china_defeat_yi_pei_kou")
             }
             if settings.imperial_china_defeat_ou_di_wan_li
-                && scenario_progress.old >= 533
-                && scenario_progress.old < 550
-                && scenario_progress.current == 550
+                && scenario_progress.current >= 532
+                && duration_frames_value.current == 360
+                && duration_frames_value.old == 0
             {
-                split(splits, "imperial_china_defeat_yi_pei_kou")
+                split(splits, "imperial_china_defeat_ou_di_wan_lee")
             }
             if settings.imperial_china_end_split
                 && scenario_progress.current == 650

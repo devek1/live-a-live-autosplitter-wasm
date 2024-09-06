@@ -14,6 +14,7 @@ impl Prehistory {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<u32>,
         transition_state: &Pair<u32>,
+        duration_frames_value: &Pair<u32>,
     ) {
         // Start Split
         if settings.start_prehistory
@@ -59,9 +60,9 @@ impl Prehistory {
                 split(splits, "prehistory_defeat_zaki_3")
             }
             if settings.prehistory_defeat_odo
-                && scenario_progress.old >= 405
-                && scenario_progress.old < 410
-                && scenario_progress.current == 410
+                && scenario_progress.current == 405
+                && duration_frames_value.current == 360
+                && duration_frames_value.old == 0
             {
                 split(splits, "prehistory_defeat_odo")
             }

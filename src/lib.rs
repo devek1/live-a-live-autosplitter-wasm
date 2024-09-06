@@ -246,6 +246,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                &duration_frames_value,
                             );
 
                             scenario_progress::distant_future::DistantFuture::maybe_split(
@@ -265,6 +266,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                &duration_frames_value,
                             );
                             
                             scenario_progress::wild_west::WildWest::maybe_split(
@@ -274,6 +276,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                &duration_frames_value,
                             );
                             scenario_progress::present_day::PresentDay::maybe_split(
                                 &settings,
@@ -293,6 +296,7 @@ async fn main() {
                                 &scenario_progress,
                                 &map_id,
                                 &transition_state,
+                                &duration_frames_value,
                             );
 
                             scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
@@ -303,6 +307,7 @@ async fn main() {
                                 &chapter_data,
                                 &map_id,
                                 &transition_state,
+                                &duration_frames_value,
                             );
 
                             scenario_progress::middle_ages::MiddleAges::maybe_split(

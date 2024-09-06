@@ -61,7 +61,11 @@ pub struct Settings {
     pub near_future_robot: bool,
     /// Near Future - Enter Steel Titan 2
     pub near_future_enter_titan_2: bool,
-    // Near Future - Chapter Complete
+    /// Near Future - Enter Great Inko Fight
+    pub near_future_enter_inko_fight: bool,
+    /// Near Future - Defeat The Great Inko
+    pub near_future_defeat_inko: bool,
+    /// Near Future - Chapter Complete
     pub near_future_end_split: bool,
     
     distant_future: Title,
@@ -73,8 +77,8 @@ pub struct Settings {
     pub distant_future_end_split: bool,
 
     twilight_of_edo_japan: Title,
-    /// Edo Japan - After Dodging Attic Ninja
-    pub twilight_dodge_attic_ninja: bool,
+    /// Edo Japan - After Attic Ninja Appears
+    pub twilight_attic_ninja_appears: bool,
     /// Edo Japan - Level 5 (>=56xp) Storehouse Leave
     pub twilight_level_5_storehouse_leave: bool,
     /// Edo Japan - OR: Level 6 Storehouse Leave
@@ -89,6 +93,8 @@ pub struct Settings {
     pub twilight_defeat_yodogimi: bool,
     /// Edo Japan - Defeat Ode Iou (Human Form)
     pub twilight_defeat_ode_iou: bool,
+    /// Edo Japan - Defeat Ode Iou (Gamahebi Transformation)
+    pub twilight_defeat_gamahebi: bool,
     // Edo Japan - Chapter Complete
     pub twilight_end_split: bool,
 
