@@ -11,16 +11,14 @@ A multiplatform autosplitter for Live a Live (PC)
 # TODO:
 - [~] Character Story Splits
    - partially done in `revamp` branch, going through to get scenario ids
-- [ ] Full game ending splits
+- [x] Full game ending splits
     - [x] True Ending - Sin Odio end flash (this is the main and currently only official speedrun category)
-    - [ ] Incomplete Destiny Ending - cutscene after completing partial boss rush
-    - [ ] Never Ending - defeat Oersted? save prompt after completion? (a change in Scenario Progress after defeating Oersted is not guaranteed, particularly in the context of multi-ending runs like All Achievements)
+    - [x] Incomplete Destiny Ending - cutscene after completing partial boss rush
+    - [x] Never Ending - defeat Oersted? save prompt after completion? (a change in Scenario Progress after defeating Oersted is not guaranteed, particularly in the context of multi-ending runs like All Achievements)
     - [x] Sad Ending - skip cutscene after defeating all protagonists
     - [x] Armageddon (in Oersted route) - animation of activating the Armageddon action
-- [ ] TODO: Determine a better way to handle Present Day defeated enemies.
-  - intVars + in controller Face icons dont work for last enemy (since the game does this intentionally so you can reload the save)
-  - Maybe add a collective split when the odie kill animation starts.
-  - [ ] map id change for starting odie.
+- [x] Determine a better way to handle Present Day defeated enemies.
+  - counting boss defeat animations
 
 ## Install
 
