@@ -121,7 +121,7 @@ async fn main() {
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
         let module = Module::wait_attach(&process, V4_27, main_module_base).await;
-        let GWorld = module.g_world();
+        //let GWorld = module.g_world();
         // Managers
         // 0x4A2DA88, 0x20, 0x20 // Engine off of GameInstance_C (for now).
         // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78 // World
