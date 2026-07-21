@@ -266,11 +266,7 @@ async fn main() {
                     {
                         timer::set_variable_int("Current Chapter", current_chapter.current);
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
-                        //timer::set_variable_int("Map ID", map_id.current);
-                        //timer::set_variable("Map Tag Address", &format!("{}",map_ptr.deref_offsets(&process, &module).unwrap_or(Address::NULL)));
-                        if let Ok(_name) = module.get_fname::<128>(&process, map_key.current) {
-                            timer::set_variable("Map FName", _name.validate_utf8().unwrap_or("failed"));
-                        } else { timer::set_variable("Map FName", "failed"); }
+                        timer::set_variable("Current Map", map_name.current.validate_utf8().unwrap_or("[error]"));
                         timer::set_variable_int("Transition State", transition_state.current);
                         timer::set_variable_int("FPV", frame_pointer_value.current);
                         timer::set_variable_int("DF", duration_frames_value.current);
