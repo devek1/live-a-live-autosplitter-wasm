@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use crate::settings::Settings;
 use crate::split;
 use crate::Chapter;
+use asr::string::ArrayCString;
 use asr::watcher::Pair;
 
 pub struct DistantFuture;
@@ -12,7 +13,7 @@ impl DistantFuture {
         splits: &mut HashSet<String>,
         current_chapter: &Pair<u8>,
         scenario_progress: &Pair<u16>,
-        map_id: &Pair<u32>,
+        map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
     ) {
@@ -41,7 +42,7 @@ impl DistantFuture {
             }
             if settings.distant_future_end_split
                 && scenario_progress.current == 650
-                && map_id.current == 0
+                && map_id.current.matches("None")
                 && transition_state.old == 4
                 && transition_state.current == 0
             {

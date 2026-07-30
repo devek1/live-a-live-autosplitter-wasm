@@ -56,4 +56,4 @@ Ending split must be done manually for now.
 2. install wasm target
   - `rustup target add wasm32-unknown-unknown`
 3. build wasm file (--release optional)
-  - `cargo build --target wasm32-unknown-unknown --release`
+  - `cargo build --release`

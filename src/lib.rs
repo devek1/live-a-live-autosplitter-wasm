@@ -1,9 +1,5 @@
 use asr::{
-    future::next_tick,
-    settings::Gui,
-    timer::{self, TimerState},
-    watcher::{Pair, Watcher},
-    Address, Process,
+    Address, Process, future::next_tick, game_engine::unreal::{Version::V4_27, *}, settings::Gui, string::ArrayCString, timer::{self, TimerState}, watcher::{Pair, Watcher},
 };
 mod scenario_progress;
 mod settings;
@@ -15,7 +11,7 @@ asr::async_main!(stable);
 
 struct ChapterData {
     pub character_data: Vec<CharacterData>,
-    pub map_id: GamePointer<u32>,
+    pub map_key: GamePointer<FNameKey>,
 }
 
 impl ChapterData {
@@ -124,6 +120,8 @@ async fn main() {
         let (main_module_base, _main_module_size) = process
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
+        let module = Module::wait_attach(&process, V4_27, main_module_base).await;
+        //let GWorld = module.g_world();
         // Managers
         // 0x4A2DA88, 0x20, 0x20 // Engine off of GameInstance_C (for now).
         // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78 // World
@@ -149,7 +147,7 @@ async fn main() {
 
         let mut chapter_data = ChapterData {
             character_data: vec![],
-            map_id: GamePointer::<u32>::new(
+            map_key: GamePointer::<FNameKey>::new(
                 main_module_base,
                 vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418],
             ),
@@ -169,6 +167,8 @@ async fn main() {
             ],
         );
 
+        let mut map_name_watcher = Watcher::<ArrayCString<256>>::new();
+
         // asr::print_message("UPDATING");
         process
             .until_closes(async {
@@ -181,7 +181,8 @@ async fn main() {
                     let current_chapter = current_chapter_pointer.update_value(&process);
                     let new_game_start = new_game_start_pointer.update_value(&process);
                     let scenario_progress = scenario_progress_pointer.update_value(&process);
-                    let map_id = chapter_data.map_id.update_value(&process);
+                    let map_key = chapter_data.map_key.update_value(&process);
+                    let map_name = map_name_watcher.update_infallible(module.get_fname(&process, map_key.current).unwrap_or_default());
 
                     let transition_state = transition_state_pointer.update_value(&process);
 
@@ -265,7 +266,7 @@ async fn main() {
                     {
                         timer::set_variable_int("Current Chapter", current_chapter.current);
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
-                        timer::set_variable_int("Map ID", map_id.current);
+                        timer::set_variable("Current Map", map_name.current.validate_utf8().unwrap_or("[error]"));
                         timer::set_variable_int("Transition State", transition_state.current);
                         timer::set_variable_int("FPV", frame_pointer_value.current);
                         timer::set_variable_int("DF", duration_frames_value.current);
@@ -305,7 +306,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -315,7 +316,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -325,7 +326,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 bosses_defeated,
                                 &duration_frames_value,
@@ -336,7 +337,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -345,7 +346,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 bosses_defeated,
                                 &duration_frames_value,
@@ -356,7 +357,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -367,7 +368,7 @@ async fn main() {
                                 &current_chapter,
                                 &scenario_progress,
                                 &chapter_data,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -377,7 +378,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 &duration_frames_value,
                             );
@@ -387,7 +388,7 @@ async fn main() {
                                 &mut splits,
                                 &current_chapter,
                                 &scenario_progress,
-                                &map_id,
+                                map_name,
                                 &transition_state,
                                 bosses_defeated,
                                 &frame_pointer_value,

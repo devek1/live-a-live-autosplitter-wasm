@@ -4,6 +4,7 @@ use crate::settings::Settings;
 use crate::split;
 use crate::Chapter;
 use crate::ChapterData;
+use asr::string::ArrayCString;
 use asr::watcher::Pair;
 
 // Locations
@@ -18,7 +19,7 @@ impl TwilightOfEdoJapan {
         current_chapter: &Pair<u8>,
         scenario_progress: &Pair<u16>,
         chapter_data: &ChapterData,
-        map_id: &Pair<u32>,
+        map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
     ) {
@@ -40,7 +41,8 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_level_5_storehouse_leave
-                && map_id.old - map_id.current == 400
+                && map_id.old.matches("id.map.07bakuma.050kura.03")
+                && map_id.current.matches("id.map.07bakuma.000odecastle.01")
                 && chapter_data
                     .character_data
                     .clone()
@@ -61,7 +63,8 @@ impl TwilightOfEdoJapan {
                 split(splits, "twilight_level_5_storehouse_leave")
             }
             if settings.twilight_level_6_storehouse_leave
-                && map_id.old - map_id.current == 400
+                && map_id.old.matches("id.map.07bakuma.050kura.03")
+                && map_id.current.matches("id.map.07bakuma.000odecastle.01")
                 && chapter_data
                     .character_data
                     .clone()
@@ -124,7 +127,7 @@ impl TwilightOfEdoJapan {
 
             if settings.twilight_end_split
                 && scenario_progress.current == 280
-                && map_id.current == 0
+                && map_id.current.matches("None")
                 && transition_state.old == 4
                 && transition_state.current == 0
             {

@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use crate::settings::Settings;
 use crate::split;
 use crate::Chapter;
+use asr::string::ArrayCString;
 use asr::watcher::Pair;
 
 pub struct WildWest;
@@ -12,7 +13,7 @@ impl WildWest {
         splits: &mut HashSet<String>,
         current_chapter: &Pair<u8>,
         scenario_progress: &Pair<u16>,
-        map_id: &Pair<u32>,
+        map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
     ) {
@@ -64,7 +65,7 @@ impl WildWest {
             }
             if settings.wild_west_end_split
                 && (scenario_progress.current == 250 || scenario_progress.current == 260)
-                && map_id.current == 0
+                && map_id.current.matches("None")
                 && transition_state.old == 4
                 && transition_state.current == 0
             {
