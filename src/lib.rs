@@ -215,7 +215,6 @@ async fn main() {
                     let map_name = map_name_watcher.update_infallible(module.get_fname(&process, map_key.current).unwrap_or_default());
 
 
-                    //temporarily not using watchers here
                     //let last_battle_name = module.get_fname::<256>(&process, last_battle_ptr.deref::<FNameKey>(&process, &module).unwrap_or(FNameKey::zeroed())).unwrap_or_default();
                     let battle_id = encounter_watcher.update_infallible(module.get_fname::<256>(&process, process.read::<FNameKey>(battle_layout_row_ptr.deref_offsets(&process,&module).unwrap_or(Address::NULL).add(0x8)).unwrap_or(FNameKey::zeroed())).unwrap_or_default());
                     let battle_result = last_battle_result_ptr.deref::<u8>(&process,&module).unwrap_or_default();
