@@ -17,6 +17,8 @@ impl ImperialChina {
         transition_state: &Pair<u32>,
         bosses_defeated: (u8, u8),
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_imperial_china
@@ -107,23 +109,20 @@ impl ImperialChina {
             }
             if settings.imperial_china_defeat_yi_pei_kou
                 && scenario_progress.current == 531
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "imperial_china_defeat_yi_pei_kou")
             }
             if settings.imperial_china_defeat_ou_di_wan_li
                 && scenario_progress.current >= 532
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "imperial_china_defeat_ou_di_wan_lee")
             }
             if settings.imperial_china_end_split
                 && scenario_progress.current == 650
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "imperial_china_end_split")
             }

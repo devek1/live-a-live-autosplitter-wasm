@@ -16,6 +16,8 @@ impl DistantFuture {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_distant_future
@@ -27,14 +29,14 @@ impl DistantFuture {
         if current_chapter.current == Chapter::DistantFuture as u8 {
             // Put Scenario Splits Here
             if settings.distant_future_confront_od10
-                && scenario_progress.current == 570
+                && battle_id.current.matches("id.battleLayout.244")
                 && duration_frames_value.current == 122
                 && duration_frames_value.old == 0
             {
                 split(splits, "distant_future_confront_od10")
             }
             if settings.distant_future_defeat_od10
-                && scenario_progress.current == 570
+                && battle_id.current.matches("id.battleLayout.244")
                 && duration_frames_value.current == 360
                 && duration_frames_value.old == 0
             {
@@ -43,8 +45,7 @@ impl DistantFuture {
             if settings.distant_future_end_split
                 && scenario_progress.current == 650
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "distant_future_end_split")
             }

@@ -16,6 +16,8 @@ impl WildWest {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_wild_west
@@ -50,10 +52,9 @@ impl WildWest {
             {
                 split(splits, "wild_west_end_ambush_phase_split")
             }
-            if settings.wild_west_defeat_odie
-                && scenario_progress.current == 200
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+            if settings.wild_west_defeat_o_dio
+                && battle_id.current.matches("id.battleLayout.211")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "wild_west_defeat_odie")
             }
@@ -66,8 +67,7 @@ impl WildWest {
             if settings.wild_west_end_split
                 && (scenario_progress.current == 250 || scenario_progress.current == 260)
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "wild_west_end_split")
             }

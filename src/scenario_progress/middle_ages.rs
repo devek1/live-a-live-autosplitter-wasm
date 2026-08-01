@@ -16,6 +16,8 @@ impl MiddleAges {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_middle_ages
@@ -52,15 +54,13 @@ impl MiddleAges {
             }
             if settings.middle_ages_archons_roost_1
                 && scenario_progress.current == 150
-                && duration_frames_value.current == 122
-                && duration_frames_value.old == 0
+                && duration_frames_value.changed_from_to(&0, &122)
             {
                 split(splits, "middle_ages_archons_roost_1")
             }
             if settings.middle_ages_defeat_lord_of_dark
-                && scenario_progress.current == 150
-                && duration_frames_value.current == 347
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.228")
+                && duration_frames_value.changed_from_to(&0, &347)
             {
                 split(splits, "middle_ages_defeat_lord_of_dark")
             }
@@ -83,45 +83,39 @@ impl MiddleAges {
                 split(splits, "middle_ages_prison_escape")
             }
             if settings.middle_ages_defeat_claustrophobia
-                && scenario_progress.current == 360
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.231")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "middle_ages_defeat_claustrophobia")
             }
             if settings.middle_ages_defeat_scotophobia
-                && scenario_progress.current == 370
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.232")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "middle_ages_defeat_scotophobia")
             }
             if settings.middle_ages_defeat_acrophobia
-                && scenario_progress.current == 380
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.233")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "middle_ages_defeat_acrophobia")
             }
             if settings.middle_ages_defeat_hygrophobia
-                && scenario_progress.current == 390
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.234")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "middle_ages_defeat_hygrophobia")
             }
             if settings.middle_ages_defeat_streibough
-                && scenario_progress.current == 420
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.302")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "middle_ages_defeat_streibough")
             }
             if settings.middle_ages_end_split
                 && scenario_progress.current == 510
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "middle_ages_end_split")
             }

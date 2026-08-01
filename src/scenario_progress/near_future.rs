@@ -16,6 +16,8 @@ impl NearFuture {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_near_future
@@ -70,24 +72,21 @@ impl NearFuture {
                 split(splits, "near_future_enter_titan_2")
             }
             if settings.near_future_enter_inko_fight
-                && scenario_progress.current == 760
-                && duration_frames_value.current == 122
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.247")
+                && duration_frames_value.changed_from_to(&0, &122)
             {
                 split(splits, "near_future_enter_inko_fight")
             }
             if settings.near_future_defeat_inko
-                && scenario_progress.current == 760
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.247")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "near_future_defeat_inko")
             }
             if settings.near_future_end_split
                 && scenario_progress.current == 900
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "near_future_end_split")
             }

@@ -15,8 +15,9 @@ impl PresentDay {
         scenario_progress: &Pair<u16>,
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
-        martial_artists_defeated: (u8, u8),
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_present_day
@@ -26,53 +27,52 @@ impl PresentDay {
             split(splits, "start_present_day")
         }
         if current_chapter.current == Chapter::PresentDay as u8 {
-            if settings.present_day_defeated_1
-                && martial_artists_defeated.1 == 0
-                && martial_artists_defeated.0 == 1
+            if settings.present_day_defeat_tula_han
+                && battle_id.current.matches("id.battleLayout.218")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_1")
+                split(splits, "present_day_defeat_tula_han")
             }
-            if settings.present_day_defeated_2
-                && martial_artists_defeated.1 == 1
-                && martial_artists_defeated.0 == 2
+            if settings.present_day_defeat_aja
+                && battle_id.current.matches("id.battleLayout.219")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_2")
+                split(splits, "present_day_defeat_aja")
             }
-            if settings.present_day_defeated_3
-                && martial_artists_defeated.1 == 2
-                && martial_artists_defeated.0 == 3
+            if settings.present_day_defeat_max
+                && battle_id.current.matches("id.battleLayout.220")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_3")
+                split(splits, "present_day_defeat_max")
             }
-            if settings.present_day_defeated_4
-                && martial_artists_defeated.1 == 3
-                && martial_artists_defeated.0 == 4
+            if settings.present_day_defeat_jackie
+                && battle_id.current.matches("id.battleLayout.221")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_4")
+                split(splits, "present_day_defeat_jackie")
             }
-            if settings.present_day_defeated_5
-                && martial_artists_defeated.1 == 4
-                && martial_artists_defeated.0 == 5
+            if settings.present_day_defeat_seishi_moribe
+                && battle_id.current.matches("id.battleLayout.222")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_5")
+                split(splits, "present_day_defeat_seishi_moribe")
             }
-            if settings.present_day_defeated_all
-                && martial_artists_defeated.1 == 5
-                && martial_artists_defeated.0 == 6
+            if settings.present_day_defeat_namkiat
+                && battle_id.current.matches("id.battleLayout.223")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
-                split(splits, "present_day_defeated_all")
+                split(splits, "present_day_defeat_namkiat")
             }
             if settings.present_day_defeat_odie
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.246")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "present_day_defeat_odie")
             }
             if settings.present_day_end_split
                 && scenario_progress.current == 0
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "present_day_end_split")
             }

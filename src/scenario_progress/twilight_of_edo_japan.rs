@@ -22,6 +22,8 @@ impl TwilightOfEdoJapan {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_twilight_of_edo_japan
@@ -62,6 +64,7 @@ impl TwilightOfEdoJapan {
             {
                 split(splits, "twilight_level_5_storehouse_leave")
             }
+            
             if settings.twilight_level_6_storehouse_leave
                 && map_id.old.matches("id.map.07bakuma.050kura.03")
                 && map_id.current.matches("id.map.07bakuma.000odecastle.01")
@@ -94,33 +97,29 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_defeat_musashi
-                && scenario_progress.current == 160
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.140")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_musashi")
             }
 
             if settings.twilight_defeat_yodogimi
-                && scenario_progress.current == 180
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && (battle_id.current.matches("id.battleLayout.164") || battle_id.current.matches("id.battleLayout.137")) //there seem to be two different versions of this battle in the game files
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_yodogimi")
             }
 
             if settings.twilight_defeat_ode_iou
-                && scenario_progress.current == 190
-                && duration_frames_value.current == 180
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.171")
+                && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_ode_iou")
             }
 
             if settings.twilight_defeat_gamahebi
-                && scenario_progress.current == 210
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.208")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "twilight_defeat_gamahebi")
             }
@@ -128,8 +127,7 @@ impl TwilightOfEdoJapan {
             if settings.twilight_end_split
                 && scenario_progress.current == 280
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "twilight_end_split")
             }

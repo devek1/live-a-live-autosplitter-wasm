@@ -4,8 +4,10 @@ use asr::{
 mod scenario_progress;
 mod settings;
 
+use bytemuck::Zeroable;
+use log::Level;
 use settings::Settings;
-use std::collections::HashSet;
+use std::{collections::HashSet};
 
 asr::async_main!(stable);
 
@@ -108,6 +110,18 @@ enum Chapter {
     Menu = 9,
 }
 
+#[repr(u8)]
+enum BattleResult {
+    None       = 0,
+    Victory    = 1,
+    Defeat     = 2, //NOTE - this is actually the default upon loading into a savefile or chapter
+    Escape     = 3,
+    Teleport   = 4,
+    Armageddon = 5,
+    Quit       = 6,
+    MAX        = 7
+}
+
 async fn main() {
     let mut splits = HashSet::<String>::new();
     let mut settings = Settings::register();
@@ -121,7 +135,22 @@ async fn main() {
             .wait_module_range("LIVEALIVE-Win64-Shipping.exe")
             .await;
         let module = Module::wait_attach(&process, V4_27, main_module_base).await;
-        //let GWorld = module.g_world();
+        let g_world = module.g_world();
+        //let last_battle_ptr = UnrealPointer::<8>::new(GWorld,&["AuthorityGameMode","BattleManager","LastBattleLayoutTag"]);
+        let last_battle_result_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","BattleManager","LastBattleResult"]);
+        //let current_battle_result_ptr = UnrealPointer::<8>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","GameResult"]);
+        let battle_layout_row_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","BattleLayoutMaster"]);
+        //let level_sequence_duration_ptr = UnrealPointer::<6>::new(g_world,&["AuthorityGameMode","BattleManager","BattleObjectCollection","CurrentBattleEventSequenceActor","SequencePlayer","DurationFrames"]);
+        //let level_sequence_position_ptr = UnrealPointer::<6>::new(g_world,&["AuthorityGameMode","BattleManager","BattleObjectCollection","CurrentBattleEventSequenceActor","SequencePlayer","NetSyncProps"]);
+        //let titles_skippable = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","WB_StartUp","SkipFlag"]);
+        //let battle_end_event_field_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","bFireEventFromBattleEnd"]);
+
+        //note that ChapterData is a struct, not a class, so we have to deref_offset to it and then add a manual offset over that to get anything from the class
+        let gameinstance = Address::from(process.read_pointer_path::<u64>(main_module_base, asr::PointerSize::Bit64, &[0x4A2DA88, 0x20]).unwrap_or_default());
+        let chapter_data_ptr = UnrealPointer::<3>::new(gameinstance,&["SaveGameManager","RICSaveGamePlay","TemporaryPlayingChapterData"]); 
+
+
+        //let test_ptr = UnrealPointer::<8>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","GameResult"]);
         // Managers
         // 0x4A2DA88, 0x20, 0x20 // Engine off of GameInstance_C (for now).
         // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78 // World
@@ -168,6 +197,7 @@ async fn main() {
         );
 
         let mut map_name_watcher = Watcher::<ArrayCString<256>>::new();
+        let mut encounter_watcher = Watcher::<ArrayCString<256>>::new();
 
         // asr::print_message("UPDATING");
         process
@@ -178,11 +208,17 @@ async fn main() {
                     settings.update();
 
                     let loading = loading_pointer.update_value(&process);
-                    let current_chapter = current_chapter_pointer.update_value(&process);
+                    let chapter = current_chapter_pointer.update_value(&process);
                     let new_game_start = new_game_start_pointer.update_value(&process);
                     let scenario_progress = scenario_progress_pointer.update_value(&process);
                     let map_key = chapter_data.map_key.update_value(&process);
                     let map_name = map_name_watcher.update_infallible(module.get_fname(&process, map_key.current).unwrap_or_default());
+
+
+                    //temporarily not using watchers here
+                    //let last_battle_name = module.get_fname::<256>(&process, last_battle_ptr.deref::<FNameKey>(&process, &module).unwrap_or(FNameKey::zeroed())).unwrap_or_default();
+                    let battle_id = encounter_watcher.update_infallible(module.get_fname::<256>(&process, process.read::<FNameKey>(battle_layout_row_ptr.deref_offsets(&process,&module).unwrap_or(Address::NULL).add(0x8)).unwrap_or(FNameKey::zeroed())).unwrap_or_default());
+                    let battle_result = last_battle_result_ptr.deref::<u8>(&process,&module).unwrap_or_default();
 
                     let transition_state = transition_state_pointer.update_value(&process);
 
@@ -192,7 +228,7 @@ async fn main() {
 
                     chapter_data.update(&process, main_module_base);
 
-                    if current_chapter.current == Chapter::ImperialChina as u8 {
+                    if chapter.current == Chapter::ImperialChina as u8 {
                         if scenario_progress.current >= 521
                             && scenario_progress.current < 531 //only run the following checks if you are in the gauntlet (and before Yi Pei Kou)
                         {
@@ -218,8 +254,8 @@ async fn main() {
                         timer::set_variable_int("Boss defeat animations", bosses_defeated.0)
                     }
 
-                    if current_chapter.current == Chapter::PresentDay as u8 {
-                        if current_chapter.old != Chapter::PresentDay as u8 //reset count on entering chapter
+                    if chapter.current == Chapter::PresentDay as u8 {
+                        if chapter.old != Chapter::PresentDay as u8 //reset count on entering chapter
                         {
                             bosses_defeated.1 = bosses_defeated.0;
                             bosses_defeated.0 = 0u8;
@@ -233,7 +269,7 @@ async fn main() {
                         timer::set_variable_int("Martial artists defeated", bosses_defeated.0)
                     }
 
-                    if current_chapter.current == Chapter::DominionOfHate as u8
+                    if chapter.current == Chapter::DominionOfHate as u8
                         && settings.dominion_pure_odio_skip
                     {
                         if scenario_progress.current == 60 //only do the following checks if Odio has appeared and hasn't been defeated yet
@@ -264,12 +300,20 @@ async fn main() {
 
                     // #[cfg(debug_assertions)]
                     {
-                        timer::set_variable_int("Current Chapter", current_chapter.current);
+                        timer::set_variable_int("Current Chapter", chapter.current);
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
                         timer::set_variable("Current Map", map_name.current.validate_utf8().unwrap_or("[error]"));
                         timer::set_variable_int("Transition State", transition_state.current);
+                        timer::set_variable("Loading", &loading.current.to_string());
                         timer::set_variable_int("FPV", frame_pointer_value.current);
                         timer::set_variable_int("DF", duration_frames_value.current);
+                        timer::set_variable_int("Last Battle Result",battle_result);
+                        timer::set_variable("Current Battle", battle_id.validate_utf8().unwrap_or_default());
+                        /*timer::set_variable("Skippable Splash Logos", match titles_skippable.deref(&process, &module){
+                            Ok(true) => "yes",
+                            Ok(false) => "no",
+                            _ => "N/A"
+                        });*/
                         for (i, character) in chapter_data.character_data.clone().iter().enumerate() {
                             timer::set_variable_int(&format!("Character {} Level:", i), character.level);
                             timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
@@ -279,8 +323,8 @@ async fn main() {
                     match timer::state() {
                         TimerState::NotRunning => {
                             if settings.start
-                                && current_chapter.old == Chapter::Menu as u8
-                                && current_chapter.current != Chapter::Menu as u8
+                                && chapter.old == Chapter::Menu as u8
+                                && chapter.current != Chapter::Menu as u8
                             {
                                 // asr::print_message("Clearing Splits and Starting");
                                 bosses_defeated = (0u8, 0u8);
@@ -304,95 +348,112 @@ async fn main() {
                             scenario_progress::prehistory::Prehistory::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
 
                             scenario_progress::distant_future::DistantFuture::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
 
                             scenario_progress::imperial_china::ImperialChina::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 bosses_defeated,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
                             
                             scenario_progress::wild_west::WildWest::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
                             scenario_progress::present_day::PresentDay::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
-                                bosses_defeated,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
     
                             scenario_progress::near_future::NearFuture::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
 
                             scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 &chapter_data,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
 
                             scenario_progress::middle_ages::MiddleAges::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
 
                             scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(
                                 &settings,
                                 &mut splits,
-                                &current_chapter,
+                                &chapter,
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
                                 bosses_defeated,
                                 &frame_pointer_value,
                                 &duration_frames_value,
+                                battle_id,
+                                battle_result,
                             );
                             
                             if settings.load_removal {

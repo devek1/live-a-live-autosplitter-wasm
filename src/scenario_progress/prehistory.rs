@@ -16,6 +16,8 @@ impl Prehistory {
         map_id: &Pair<ArrayCString<256>>,
         transition_state: &Pair<u32>,
         duration_frames_value: &Pair<u32>,
+        battle_id: &Pair<ArrayCString<256>>,
+        battle_result: u8
     ) {
         // Start Split
         if settings.start_prehistory
@@ -61,17 +63,15 @@ impl Prehistory {
                 split(splits, "prehistory_defeat_zaki_3")
             }
             if settings.prehistory_defeat_odo
-                && scenario_progress.current == 405
-                && duration_frames_value.current == 360
-                && duration_frames_value.old == 0
+                && battle_id.current.matches("id.battleLayout.243")
+                && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "prehistory_defeat_odo")
             }
             if settings.prehistory_end_split
                 && scenario_progress.current == 440
                 && map_id.current.matches("None")
-                && transition_state.old == 4
-                && transition_state.current == 0
+                && transition_state.changed_from_to(&4, &0)
             {
                 split(splits, "prehistory_end_split")
             }
