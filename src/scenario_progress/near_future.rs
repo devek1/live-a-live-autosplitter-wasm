@@ -11,23 +11,23 @@ impl NearFuture {
     pub fn maybe_split(
         settings: &Settings,
         splits: &mut HashSet<String>,
-        current_chapter: &Pair<u8>,
-        scenario_progress: &Pair<u16>,
-        map_id: &Pair<ArrayCString<256>>,
+        current_chapter: &Pair<i8>,
+        scenario_progress: &Pair<i32>,
+        map_id: &Pair<ArrayCString<64>>,
         transition_state: &Pair<u32>,
-        duration_frames_value: &Pair<u32>,
-        battle_id: &Pair<ArrayCString<256>>,
+        duration_frames_value: &Pair<i32>,
+        battle_id: &Pair<i32>,
         battle_result: u8
     ) {
         // Start Split
         if settings.start_near_future
-            && current_chapter.old == Chapter::Menu as u8
-            && current_chapter.current == Chapter::NearFuture as u8
+            && current_chapter.old == Chapter::Menu as i8
+            && current_chapter.current == Chapter::NearFuture as i8
         {
             split(splits, "start_near_future")
         }
 
-        if current_chapter.current == Chapter::NearFuture as u8 {
+        if current_chapter.current == Chapter::NearFuture as i8 {
             // Put Scenario Splits Here
             if settings.near_future_park
                 && scenario_progress.old >= 85
@@ -72,13 +72,13 @@ impl NearFuture {
                 split(splits, "near_future_enter_titan_2")
             }
             if settings.near_future_enter_inko_fight
-                && battle_id.current.matches("id.battleLayout.247")
+                && battle_id.current == 247
                 && duration_frames_value.changed_from_to(&0, &122)
             {
                 split(splits, "near_future_enter_inko_fight")
             }
             if settings.near_future_defeat_inko
-                && battle_id.current.matches("id.battleLayout.247")
+                && battle_id.current == 247
                 && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "near_future_defeat_inko")

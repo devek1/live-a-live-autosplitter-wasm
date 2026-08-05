@@ -11,23 +11,23 @@ impl ImperialChina {
     pub fn maybe_split(
         settings: &Settings,
         splits: &mut HashSet<String>,
-        current_chapter: &Pair<u8>,
-        scenario_progress: &Pair<u16>,
-        map_id: &Pair<ArrayCString<256>>,
+        current_chapter: &Pair<i8>,
+        scenario_progress: &Pair<i32>,
+        map_id: &Pair<ArrayCString<64>>,
         transition_state: &Pair<u32>,
-        bosses_defeated: (u8, u8),
-        duration_frames_value: &Pair<u32>,
-        battle_id: &Pair<ArrayCString<256>>,
+        bosses_defeated: &Pair<u32>,
+        duration_frames_value: &Pair<i32>,
+        battle_id: &Pair<i32>,
         battle_result: u8
     ) {
         // Start Split
         if settings.start_imperial_china
-            && current_chapter.old == Chapter::Menu as u8
-            && current_chapter.current == Chapter::ImperialChina as u8
+            && current_chapter.old == Chapter::Menu as i8
+            && current_chapter.current == Chapter::ImperialChina as i8
         {
             split(splits, "start_imperial_china")
         }
-        if current_chapter.current == Chapter::ImperialChina as u8 {
+        if current_chapter.current == Chapter::ImperialChina as i8 {
             // Put Scenario Splits Here
             //
             if settings.imperial_china_recruit_all_disciples
@@ -74,36 +74,36 @@ impl ImperialChina {
             }
             if settings.imperial_china_defeat_su_xi_san_xi
                 && scenario_progress.current == 521
-                && bosses_defeated.0 == 2
-                && bosses_defeated.1 < 2
+                && bosses_defeated.current == 2
+                && bosses_defeated.old < 2
             {
                 split(splits, "imperial_china_defeat_su_xi_san_xi")
             }
             if settings.imperial_china_defeat_yi_xi_er_xi
                 && scenario_progress.current == 522
-                && bosses_defeated.0 == 2
-                && bosses_defeated.1 < 2
+                && bosses_defeated.current == 2
+                && bosses_defeated.old < 2
             {
                 split(splits, "imperial_china_defeat_yi_xi_er_xi")
             }
             if settings.imperial_china_defeat_tong_cha_sha_cha
                 && scenario_progress.current == 523
-                && bosses_defeated.0 == 2
-                && bosses_defeated.1 < 2
+                && bosses_defeated.current == 2
+                && bosses_defeated.old < 2
             {
                 split(splits, "imperial_china_defeat_tong_cha_sha_cha")
             }
             if settings.imperial_china_defeat_pei_cha_nan_cha
                 && scenario_progress.current == 524
-                && bosses_defeated.0 == 2
-                && bosses_defeated.1 < 2
+                && bosses_defeated.current == 2
+                && bosses_defeated.old < 2
             {
                 split(splits, "imperial_china_defeat_pei_cha_nan_cha")
             }
             if settings.imperial_china_defeat_xian_lin_chan
                 && scenario_progress.current == 530
-                && bosses_defeated.0 == 3
-                && bosses_defeated.1 < 3
+                && bosses_defeated.current == 3
+                && bosses_defeated.old < 3
             {
                 split(splits, "imperial_china_defeat_xian_lin_chan")
             }

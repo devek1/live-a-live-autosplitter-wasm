@@ -145,7 +145,7 @@ pub struct Settings {
     pub prehistory_defeat_zaki_2: bool,
     /// Defeat Zaki 3
     pub prehistory_defeat_zaki_3: bool,
-    /// Defeat Odo
+    /// Defeat Oodiioo
     pub prehistory_defeat_odo: bool,
     /// Chapter Complete
     pub prehistory_end_split: bool,
@@ -234,8 +234,25 @@ pub struct Settings {
     pub dominion_enter_sin_fight: bool,
     /// End Sin Odio Phase 1
     pub dominion_end_sin_phase1: bool,
+
+    ///Dominion of Hate - Optional Bosses
+    #[heading_level = 1]
+    pub dominion_optional_bosses : Title,
+    /// Defeat erauqS
+    pub dominion_erauqs : bool,
+    /// Defeat Lucretius
+    pub dominion_lucretius : bool,
+    /// Defeat Apophisphio
+    pub dominion_apophisphio : bool,
+    /// Defeat Jaggedy Jacks
+    pub dominion_jaggedy_jacks : bool,
+    /// Defeat Headhunter
+    pub dominion_headhunter : bool,
+    /// Defeat Death Prophet
+    pub dominion_death_prophet : bool,
     
     /// Dominion of Hate (Oersted)
+    #[heading_level = 1]
     dominion_of_hate_oersted: Title,
     /// Start as Oersted
     pub dominion_oersted_start: bool,

@@ -11,22 +11,22 @@ impl Prehistory {
     pub fn maybe_split(
         settings: &Settings,
         splits: &mut HashSet<String>,
-        current_chapter: &Pair<u8>,
-        scenario_progress: &Pair<u16>,
-        map_id: &Pair<ArrayCString<256>>,
+        current_chapter: &Pair<i8>,
+        scenario_progress: &Pair<i32>,
+        map_id: &Pair<ArrayCString<64>>,
         transition_state: &Pair<u32>,
-        duration_frames_value: &Pair<u32>,
-        battle_id: &Pair<ArrayCString<256>>,
+        duration_frames_value: &Pair<i32>,
+        battle_id: &Pair<i32>,
         battle_result: u8
     ) {
         // Start Split
         if settings.start_prehistory
-            && current_chapter.old == Chapter::Menu as u8
-            && current_chapter.current == Chapter::Prehistory as u8
+            && current_chapter.old == Chapter::Menu as i8
+            && current_chapter.current == Chapter::Prehistory as i8
         {
             split(splits, "start_prehistory")
         }
-        if current_chapter.current == Chapter::Prehistory as u8 {
+        if current_chapter.current == Chapter::Prehistory as i8 {
             if settings.prehistory_turn_in_meat_to_elder
                 && scenario_progress.old >= 70
                 && scenario_progress.old < 80
@@ -63,7 +63,7 @@ impl Prehistory {
                 split(splits, "prehistory_defeat_zaki_3")
             }
             if settings.prehistory_defeat_odo
-                && battle_id.current.matches("id.battleLayout.243")
+                && battle_id.current == 243
                 && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "prehistory_defeat_odo")

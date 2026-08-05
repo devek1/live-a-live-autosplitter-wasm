@@ -11,22 +11,22 @@ impl WildWest {
     pub fn maybe_split(
         settings: &Settings,
         splits: &mut HashSet<String>,
-        current_chapter: &Pair<u8>,
-        scenario_progress: &Pair<u16>,
-        map_id: &Pair<ArrayCString<256>>,
+        current_chapter: &Pair<i8>,
+        scenario_progress: &Pair<i32>,
+        map_id: &Pair<ArrayCString<64>>,
         transition_state: &Pair<u32>,
-        duration_frames_value: &Pair<u32>,
-        battle_id: &Pair<ArrayCString<256>>,
+        duration_frames_value: &Pair<i32>,
+        battle_id: &Pair<i32>,
         battle_result: u8
     ) {
         // Start Split
         if settings.start_wild_west
-            && current_chapter.old == Chapter::Menu as u8
-            && current_chapter.current == Chapter::WildWest as u8
+            && current_chapter.old == Chapter::Menu as i8
+            && current_chapter.current == Chapter::WildWest as i8
         {
             split(splits, "start_wild_west")
         }
-        if current_chapter.current == Chapter::WildWest as u8 {
+        if current_chapter.current == Chapter::WildWest as i8 {
             if settings.wild_west_defeat_mad_dog_intro
                 && scenario_progress.old == 30
                 && scenario_progress.current == 40
@@ -53,7 +53,7 @@ impl WildWest {
                 split(splits, "wild_west_end_ambush_phase_split")
             }
             if settings.wild_west_defeat_o_dio
-                && battle_id.current.matches("id.battleLayout.211")
+                && battle_id.current == 211
                 && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "wild_west_defeat_odie")

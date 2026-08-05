@@ -16,23 +16,23 @@ impl TwilightOfEdoJapan {
     pub fn maybe_split(
         settings: &Settings,
         splits: &mut HashSet<String>,
-        current_chapter: &Pair<u8>,
-        scenario_progress: &Pair<u16>,
+        current_chapter: &Pair<i8>,
+        scenario_progress: &Pair<i32>,
         chapter_data: &ChapterData,
-        map_id: &Pair<ArrayCString<256>>,
+        map_id: &Pair<ArrayCString<64>>,
         transition_state: &Pair<u32>,
-        duration_frames_value: &Pair<u32>,
-        battle_id: &Pair<ArrayCString<256>>,
+        duration_frames_value: &Pair<i32>,
+        battle_id: &Pair<i32>,
         battle_result: u8
     ) {
         // Start Split
         if settings.start_twilight_of_edo_japan
-            && current_chapter.old == Chapter::Menu as u8
-            && current_chapter.current == Chapter::TwilightOfEdoJapan as u8
+            && current_chapter.old == Chapter::Menu as i8
+            && current_chapter.current == Chapter::TwilightOfEdoJapan as i8
         {
             split(splits, "start_twilight_of_edo_japan")
         }
-        if current_chapter.current == Chapter::TwilightOfEdoJapan as u8 {
+        if current_chapter.current == Chapter::TwilightOfEdoJapan as i8 {
             // Put Scenario Splits Here
             if settings.twilight_attic_ninja_appears
                 && scenario_progress.old >= 70
@@ -97,28 +97,28 @@ impl TwilightOfEdoJapan {
             }
 
             if settings.twilight_defeat_musashi
-                && battle_id.current.matches("id.battleLayout.140")
+                && battle_id.current == 140
                 && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_musashi")
             }
 
             if settings.twilight_defeat_yodogimi
-                && (battle_id.current.matches("id.battleLayout.164") || battle_id.current.matches("id.battleLayout.137")) //there seem to be two different versions of this battle in the game files
+                && (battle_id.current == 164 || battle_id.current == 137) //there seem to be two different versions of this battle in the game files
                 && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_yodogimi")
             }
 
             if settings.twilight_defeat_ode_iou
-                && battle_id.current.matches("id.battleLayout.171")
+                && battle_id.current == 171
                 && duration_frames_value.changed_from_to(&0, &180)
             {
                 split(splits, "twilight_defeat_ode_iou")
             }
 
             if settings.twilight_defeat_gamahebi
-                && battle_id.current.matches("id.battleLayout.208")
+                && battle_id.current == 208
                 && duration_frames_value.changed_from_to(&0, &360)
             {
                 split(splits, "twilight_defeat_gamahebi")
