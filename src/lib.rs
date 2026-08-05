@@ -13,9 +13,6 @@ use crate::helpers::{*};
 
 asr::async_main!(stable);
 
-//reference values to compare FStrings to, set up using `<string>.split("").map(a=>"0x" + a.charCodeAt(0).toString(16).toUpperCase()).toString()` in JS
-static DOMINION_ESCAPE_COUNT : [u16;19] = [0x30,0x38,0x4C,0x61,0x73,0x74,0x5F,0x65,0x73,0x63,0x61,0x70,0x65,0x5F,0x63,0x6F,0x75,0x6E,0x74];
-static DOMINION_HEROES_RECRUITED : [u16;18] = [0x30,0x38,0x6C,0x61,0x73,0x74,0x5F,0x74,0x6F,0x74,0x61,0x6C,0x5F,0x73,0x63,0x6F,0x75,0x74];
 
 
 
@@ -80,12 +77,12 @@ async fn main() {
                 // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338 // BattleManager
                 // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x368 // EventManager
                 // 0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x417 // FieldManager -> CurrentMapTag.TagName
-                let mut chapter_pointer =
-                    GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]);
+                /*let mut chapter_pointer =
+                    GamePointer::<u8>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x28]);*/
                 let mut new_game_start_pointer =
                     GamePointer::<u8>::new(main_module_base, vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348]);
-                let mut scenario_progress_pointer =
-                    GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);
+                /*let mut scenario_progress_pointer =
+                    GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);*/
                 let mut loading_pointer = GamePointer::<u8>::new(
                     main_module_base,
                     vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
@@ -104,7 +101,7 @@ async fn main() {
                 };
 
                 // Frame number value for Sin Odio fight.
-                let mut frame_number_pointer = GamePointer::<u32>::new(
+                /*let mut frame_number_pointer = GamePointer::<u32>::new(
                     main_module_base,
                     vec![
                         0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338, 0x1B0, 0xF0, 0x250, 0x438,
@@ -115,63 +112,31 @@ async fn main() {
                     vec![
                         0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x338, 0x1B0, 0xF0, 0x250, 0x2C4,
                     ],
-                );
+                );*/
 
                 let mut chapter_watcher = Watcher::<i8>::new();
                 let mut frame_number_watcher = Watcher::<i32>::new();
                 let mut frame_duration_watcher = Watcher::<i32>::new();
                 let mut scenario_progress_watcher = Watcher::<i32>::new();
                 let mut loading_watcher = Watcher::<bool>::new();
-                let mut map_key_watcher = Watcher::<FNameKey>::new();
+                //let mut map_key_watcher = Watcher::<FNameKey>::new();
                 let mut map_name_watcher = Watcher::<ArrayCString<64>>::new();
                 let mut encounter_watcher = Watcher::<i32>::new();
                 let mut bosses_defeated_watcher = Watcher::<u32>::new();
                 bosses_defeated_watcher.update_infallible(0); //initializing the internal pair
 
+                let mut escape_watcher = Watcher::<i32>::new();
+                let mut recruit_watcher = Watcher::<i32>::new();
+                escape_watcher.update_infallible(0); //initializing the internal pair
+                recruit_watcher.update_infallible(0); //initializing the internal pair
 
-                //Testing ScriptVariables
-                //NOTE FOR TOMORROW: The keys are FStrings (=TArray of UTF16 chars) not FGameplayTags/FNames!
-                'blk: {
-                    //let start = Instant::now();
-                    let mut IntVariables: std::collections::HashMap<String, i32> = std::collections::HashMap::<String,i32>::new();
-                    static INTVAR_SIZE : i32 = 0x20; //8 bytes (pointer), 2*4=8 bytes (count+max), 4 bytes (int), 2*4=8 bytes (hash stuff), IDK where last 4 bytes from
-                    let mapPtr = chapter_data_ptr.deref_offsets(&process, &module).unwrap_or(Address::NULL).add(0x78);
-                    asr::print_message(&format!("Map Pointer: {}",mapPtr));
-                    let Ok(mapData) = process.read_pointer(mapPtr,Bit64) else {break 'blk;};
-                    asr::print_message("Trying to read ScriptVariables");
-                    let count = process.read::<i32>(mapPtr.add(0x8)).unwrap_or_default();
-                    asr::print_message(&format!("IntVars count: {}", count));
-                    for i in 0..count {
-                        let addr = mapData + i * INTVAR_SIZE;
-                        let strLen = process.read::<usize>(addr.add(0x8)).unwrap_or_default();
-                        let str = String::from_utf16_lossy(process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice());
-                        /*if process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().matches([48,56,76,97,115,116,95,101,115,99,97,112,101,95,99,111,117,110,116]) {
-                            asr::print_message(&format!("{:#06X?}",process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice()));
-                        }*/
-                        //if !str.starts_with("08") {continue;} // <----temporary
-                        //let _str = process.read_vec(process.read_pointer(addr,Bit64).unwrap_or(Address::NULL),strLen).unwrap_or_default();
-                        //let str = String::from_utf16_lossy(&_str);
-                        if str == "08Last_escape_count" {
-                            asr::print_message(&format!("Escape count at: {}",addr.add(0x10)))
-                        }
-                        IntVariables.insert(
-                            str,
-                            process.read(addr.add(0x10)).unwrap_or_default()
-                        );
-                    }
-                    asr::print_message(&format!("TMap at: {}", mapData));
-                    asr::print_message(&format!("IntVars found: {}", IntVariables.len()));
-                    let mut _str = String::default();
-                    for (tag,val) in IntVariables {
-                        _str += &format!("{} : {}, ",tag,val);
-                    }
-                    asr::print_message(&_str);
-                    //asr::print_message(&format!("intvars read in {} seconds",start.elapsed().as_secs_f64()));
-                }
 
-                let mut in_odio_fight = false;
+                
+
+                //let mut in_odio_fight = false;
                 loop {
                     settings.update();
+
 
                     let chapter_data_addr = chapter_data_ptr.deref_offsets(&process, &module).unwrap_or(Address::NULL);
 
@@ -195,6 +160,57 @@ async fn main() {
 
                     let frame_pointer = frame_number_watcher.update_infallible(level_sequence_position_ptr.deref(&process, &module).unwrap_or_default()); //frame_number_pointer.update_value(&process);
                     let duration_frames = frame_duration_watcher.update_infallible(level_sequence_duration_ptr.deref(&process, &module).unwrap_or_default()); //duration_frames_pointer.update_value(&process);
+
+                    //Testing ScriptVariables
+                    //NOTE FOR TOMORROW: The keys are FStrings (=TArray of UTF16 chars) not FGameplayTags/FNames!
+                    'blk: {
+                        if chapter.current != Chapter::DominionOfHate as i8 {break 'blk;} //for some reason labeled blocks can't have an if
+                        //let start = Instant::now();
+                        //let mut IntVariables: std::collections::HashMap<String, i32> = std::collections::HashMap::<String,i32>::new();
+                        static INTVAR_SIZE : i32 = 0x20; //8 bytes (pointer), 2*4=8 bytes (count+max), 4 bytes (int), 2*4=8 bytes (hash stuff), IDK where last 4 bytes from
+                        let mapPtr = chapter_data_ptr.deref_offsets(&process, &module).unwrap_or(Address::NULL).add(0x78);
+                        //asr::print_message(&format!("Map Pointer: {}",mapPtr));
+                        let Ok(mapData) = process.read_pointer(mapPtr,Bit64) else {break 'blk;};
+                        //asr::print_message("Trying to read ScriptVariables");
+                        let count = process.read::<i32>(mapPtr.add(0x8)).unwrap_or_default();
+                        //asr::print_message(&format!("IntVars count: {}", count));
+                        for i in 0..count {
+                            let addr = mapData + i * INTVAR_SIZE;
+                            //let strLen = process.read::<usize>(addr.add(0x8)).unwrap_or_default();
+                            //let str = String::from_utf16_lossy(process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice());
+                            /*if process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().matches([48,56,76,97,115,116,95,101,115,99,97,112,101,95,99,111,117,110,116]) {
+                                asr::print_message(&format!("{:#06X?}",process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice()));
+                            }*/
+                            //if !str.starts_with("08") {continue;} // <----temporary
+                            //let _str = process.read_vec(process.read_pointer(addr,Bit64).unwrap_or(Address::NULL),strLen).unwrap_or_default();
+                            //let str = String::from_utf16_lossy(&_str);
+                            /*if str == "08Last_escape_count" {
+                                asr::print_message(&format!("Escape count at: {}",addr.add(0x10)))
+                            }
+                            IntVariables.insert(
+                                str,
+                                process.read(addr.add(0x10)).unwrap_or_default()
+                            );*/
+                            match process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice() {
+                                //comparisons set up using `<string>.split("").map(a=>"0x" + a.charCodeAt(0).toString(16).toUpperCase()).toString()` in JS
+                                &[0x30,0x38,0x4C,0x61,0x73,0x74,0x5F,0x65,0x73,0x63,0x61,0x70,0x65,0x5F,0x63,0x6F,0x75,0x6E,0x74]
+                                    => { escape_watcher.update_infallible(process.read(addr.add(0x10)).unwrap_or_default()); }
+                                &[0x30,0x38,0x6C,0x61,0x73,0x74,0x5F,0x74,0x6F,0x74,0x61,0x6C,0x5F,0x73,0x63,0x6F,0x75,0x74]
+                                    => { recruit_watcher.update_infallible(process.read(addr.add(0x10)).unwrap_or_default()); }
+                                _ => ()
+                            }
+                        }
+                        //asr::print_message(&format!("TMap at: {}", mapData));
+                        //asr::print_message(&format!("IntVars found: {}", IntVariables.len()));
+                        /*let mut _str = String::default();
+                        for (tag,val) in IntVariables {
+                            _str += &format!("{} : {}, ",tag,val);
+                        }*/
+                        //asr::print_message(&_str);
+                        //asr::print_message(&format!("intvars read in {} seconds",start.elapsed().as_secs_f64()));
+                    }
+                    let escape_count = escape_watcher.pair.unwrap();
+                    let recruit_count = recruit_watcher.pair.unwrap();
                         
 
                     chapter_data.update(&process, main_module_base);
@@ -227,7 +243,6 @@ async fn main() {
                     }
 
                     if chapter.current == Chapter::DominionOfHate as i8
-                        
                     {
                         if battle_id.current == 256 && settings.dominion_pure_odio_skip //Odio fight (i.e. the face and Pure Odio. This logic is intended for the glitch where you skip the latter)
                         {
@@ -277,6 +292,8 @@ async fn main() {
                         timer::set_variable_int("Current Battle", battle_id.current);
                         timer::set_variable_int("New Game Check", new_game_start.current);
                         timer::set_variable_int("Counted boss vanishes", bosses_defeated.current);
+                        timer::set_variable_int("Dominion Flees", escape_count.current);
+                        timer::set_variable_int("Dominion Recruits", recruit_count.current);
                         /*timer::set_variable("Skippable Splash Logos", match titles_skippable.deref(&process, &module){
                             Ok(true) => "yes",
                             Ok(false) => "no",
