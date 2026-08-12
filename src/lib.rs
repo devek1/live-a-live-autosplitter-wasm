@@ -177,11 +177,7 @@ async fn main() {
                         for i in 0..count {
                             let addr = mapData + i * INTVAR_SIZE;
                             //let strLen = process.read::<usize>(addr.add(0x8)).unwrap_or_default();
-                            //let str = String::from_utf16_lossy(process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice());
-                            /*if process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().matches([48,56,76,97,115,116,95,101,115,99,97,112,101,95,99,111,117,110,116]) {
-                                asr::print_message(&format!("{:#06X?}",process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[0x0,0x0]).unwrap_or_default().as_slice()));
-                            }*/
-                            //if !str.starts_with("08") {continue;} // <----temporary
+                            //let str = String::from_utf16_lossy(process.read_pointer_path::<ArrayWString<128>>(addr, Bit64, &[
                             //let _str = process.read_vec(process.read_pointer(addr,Bit64).unwrap_or(Address::NULL),strLen).unwrap_or_default();
                             //let str = String::from_utf16_lossy(&_str);
                             /*if str == "08Last_escape_count" {
@@ -278,21 +274,24 @@ async fn main() {
                     let bosses_defeated = bosses_defeated_watcher.pair.unwrap();
 
 
-                    // #[cfg(debug_assertions)]
+                    //info that is valid to see normally
+                    timer::set_variable_int("Current Chapter", chapter.current);
+                    timer::set_variable("Current Map", map_name.current.validate_utf8().unwrap_or("[error]"));
+                    timer::set_variable("Loading Done", &loading.current.to_string());
+                    timer::set_variable_int("Last Battle Result",battle_result);
+                    timer::set_variable_int("Dominion Flees", escape_count.current);
+                    
                     {
-                        timer::set_variable_int("Current Chapter", chapter.current);
+                        #![cfg(debug_assertions)]
+                        //info that should be kept internal
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
-                        timer::set_variable("Current Map", map_name.current.validate_utf8().unwrap_or("[error]"));
                         timer::set_variable_int("Transition State", transition_state.current);
-                        timer::set_variable("Loading", &loading.current.to_string());
                         //timer::set_variable("Loading (Alt)", &loading_alt.current.to_string());
                         timer::set_variable_int("FPV", frame_pointer.current);
                         timer::set_variable_int("DF", duration_frames.current);
-                        timer::set_variable_int("Last Battle Result",battle_result);
                         timer::set_variable_int("Current Battle", battle_id.current);
                         timer::set_variable_int("New Game Check", new_game_start.current);
                         timer::set_variable_int("Counted boss vanishes", bosses_defeated.current);
-                        timer::set_variable_int("Dominion Flees", escape_count.current);
                         timer::set_variable_int("Dominion Recruits", recruit_count.current);
                         /*timer::set_variable("Skippable Splash Logos", match titles_skippable.deref(&process, &module){
                             Ok(true) => "yes",
@@ -309,158 +308,151 @@ async fn main() {
                             timer::set_variable_int(&format!("Character {} Exp:", i), character.exp);
                         }      
                     }
-       
-                    match timer::state() {
-                        TimerState::NotRunning => {
-                            if settings.start
-                                && chapter.old == Chapter::Menu as i8
-                                && chapter.current != Chapter::Menu as i8
-                            {
-                                // asr::print_message("Clearing Splits and Starting");
-                                bosses_defeated_watcher.update_infallible(0);
-                                splits = HashSet::<String>::new();
-                                timer::start();
-                            }
 
-                            if settings.new_start
-                                && new_game_start.old == 0
-                                && new_game_start.current > 0
-                            {
-                                // asr::print_message("Clearing Splits and Starting");
-                                bosses_defeated_watcher.update_infallible(0);
-                                splits = HashSet::<String>::new();
-                                timer::start();
-                            }
+                    if settings.start
+                        && chapter.old == Chapter::Menu as i8
+                        && chapter.current != Chapter::Menu as i8
+                    {
+                        // asr::print_message("Clearing Splits and Starting");
+                        bosses_defeated_watcher.update_infallible(0);
+                        splits = HashSet::<String>::new();
+                        timer::start();
+                    }
+
+                    if settings.new_start
+                        && new_game_start.old == 0
+                        && new_game_start.current > 0
+                    {
+                        // asr::print_message("Clearing Splits and Starting");
+                        bosses_defeated_watcher.update_infallible(0);
+                        splits = HashSet::<String>::new();
+                        timer::start();
+                    }
+                    // CHAPTER SPLITS
+
+                    scenario_progress::prehistory::Prehistory::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::distant_future::DistantFuture::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::imperial_china::ImperialChina::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &bosses_defeated,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+                    
+                    scenario_progress::wild_west::WildWest::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+                    scenario_progress::present_day::PresentDay::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::near_future::NearFuture::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        &chapter_data,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::middle_ages::MiddleAges::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+
+                    scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(
+                        &settings,
+                        &mut splits,
+                        chapter,
+                        &scenario_progress,
+                        map_name,
+                        &transition_state,
+                        &bosses_defeated,
+                        frame_pointer,
+                        &duration_frames,
+                        battle_id,
+                        battle_result,
+                    );
+                    
+                    if settings.load_removal {
+                        // load/save removal
+                        timer::set_variable_int("LOADING", loading.current);
+                        if loading.old == 0 && loading.current == 1 {
+                            // asr::print_message("resuming game time");
+                            timer::resume_game_time()
                         }
-                        TimerState::Running => {
-                            // CHAPTER SPLITS
 
-                            scenario_progress::prehistory::Prehistory::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-
-                            scenario_progress::distant_future::DistantFuture::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-
-                            scenario_progress::imperial_china::ImperialChina::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &bosses_defeated,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-                            
-                            scenario_progress::wild_west::WildWest::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-                            scenario_progress::present_day::PresentDay::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-    
-                            scenario_progress::near_future::NearFuture::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-
-                            scenario_progress::twilight_of_edo_japan::TwilightOfEdoJapan::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                &chapter_data,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-
-                            scenario_progress::middle_ages::MiddleAges::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-
-                            scenario_progress::dominion_of_hate::DominionOfHate::maybe_split(
-                                &settings,
-                                &mut splits,
-                                chapter,
-                                &scenario_progress,
-                                map_name,
-                                &transition_state,
-                                &bosses_defeated,
-                                frame_pointer,
-                                &duration_frames,
-                                battle_id,
-                                battle_result,
-                            );
-                            
-                            if settings.load_removal {
-                                // load/save removal
-                                timer::set_variable_int("LOADING", loading.current);
-                                if loading.old == 0 && loading.current == 1 {
-                                    // asr::print_message("resuming game time");
-                                    timer::resume_game_time()
-                                }
-
-                                if loading.old == 1 && loading.current == 0 {
-                                    // asr::print_message("pausing game time");
-                                    timer::pause_game_time()
-                                }
-                            }
+                        if loading.old == 1 && loading.current == 0 {
+                            // asr::print_message("pausing game time");
+                            timer::pause_game_time()
                         }
-                        _ => {}
                     }
                     // TODO: Do something on every tick.
                     next_tick().await;
@@ -474,6 +466,9 @@ pub fn split(splits: &mut HashSet<String>, key: &str) {
     if !splits.contains(key) {
         splits.insert(key.to_string());
         asr::print_message(&key.to_string());
-        timer::split()
+        timer::split();
+        if asr::settings::Map::load().get("start_on_any_split").unwrap_or(asr::settings::Value::from(false)).get_bool().unwrap_or_default() {
+            timer::start();
+        }
     }
 }

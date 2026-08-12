@@ -17,6 +17,8 @@ pub struct Settings {
     /// Load Removal
     #[default = true]
     pub load_removal: bool,
+    /// Start on any split
+    pub start_on_any_split : bool,
 
     start_settings: Title,
     /// Start on Character Select (Single Story Start)
