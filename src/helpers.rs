@@ -1,6 +1,21 @@
-use asr::{Address, Process, game_engine::unreal::FNameKey, watcher::{Pair, Watcher}};
+use std::collections::HashSet;
+
+use asr::{Address, Process, game_engine::unreal::FNameKey, watcher::{Pair, Watcher}, timer};
 
 
+
+pub fn split(splits: &mut HashSet<String>, key: &str) {
+    if key == "" {return;}
+    let map = asr::settings::Map::load();
+    if map.get(key).unwrap_or(asr::settings::Value::from(false)).get_bool().unwrap_or_default() && !splits.contains(key) {
+        splits.insert(key.to_string());
+        asr::print_message(&key.to_string());
+        timer::split();
+        if map.get("start_on_any_split").unwrap_or(asr::settings::Value::from(false)).get_bool().unwrap_or_default() {
+            timer::start();
+        }
+    }
+}
 
 
 pub struct ChapterData {

@@ -148,7 +148,7 @@ pub struct Settings {
     /// Defeat Zaki 3
     pub prehistory_defeat_zaki_3: bool,
     /// Defeat Oodiioo
-    pub prehistory_defeat_odo: bool,
+    pub prehistory_defeat_oodiioo: bool,
     /// Chapter Complete
     pub prehistory_end_split: bool,
 

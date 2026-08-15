@@ -6,126 +6,106 @@ use crate::Chapter;
 use asr::string::ArrayCString;
 use asr::watcher::Pair;
 
-pub struct ImperialChina;
-impl ImperialChina {
-    pub fn maybe_split(
-        settings: &Settings,
-        splits: &mut HashSet<String>,
-        current_chapter: &Pair<i8>,
-        scenario_progress: &Pair<i32>,
-        map_id: &Pair<ArrayCString<64>>,
-        transition_state: &Pair<u32>,
-        bosses_defeated: &Pair<u32>,
-        duration_frames_value: &Pair<i32>,
-        battle_id: &Pair<i32>,
-        battle_result: u8
-    ) {
-        // Start Split
-        if settings.start_imperial_china
-            && current_chapter.old == Chapter::Menu as i8
-            && current_chapter.current == Chapter::ImperialChina as i8
-        {
-            split(splits, "start_imperial_china")
-        }
-        if current_chapter.current == Chapter::ImperialChina as i8 {
-            // Put Scenario Splits Here
-            //
-            if settings.imperial_china_recruit_all_disciples
-                && scenario_progress.old >= 50
-                && scenario_progress.old < 160
-                && scenario_progress.current == 160
-            {
-                split(splits, "imperial_china_recruit_all_diciples")
-            }
-            if settings.imperial_china_training_complete
-                && scenario_progress.old >= 300
-                && scenario_progress.old < 320
-                && scenario_progress.current == 320
-            {
-                split(splits, "imperial_china_training_complete")
-            }
-            if settings.imperial_china_defeat_sun_tzu_wang
-                && scenario_progress.old >= 390
-                && scenario_progress.old < 400
-                && scenario_progress.current == 400
-            {
-                split(splits, "imperial_china_defeat_sun_tzu_wang")
-            }
-            if settings.imperial_china_defeat_temple_guards
-                && scenario_progress.old >= 470
-                && scenario_progress.old < 490
-                && scenario_progress.current == 490
-            {
-                split(splits, "imperial_china_defeat_temple_guards")
-            }
-            if settings.imperial_china_defeat_courtyard_guards
-                && scenario_progress.old >= 490
-                && scenario_progress.old < 495
-                && scenario_progress.current == 495
-            {
-                split(splits, "imperial_china_defeat_courtyard_guards")
-            }
-            if settings.imperial_china_defeat_table_guards
-                && scenario_progress.old >= 510
-                && scenario_progress.old < 520
-                && scenario_progress.current == 520
-            {
-                split(splits, "imperial_china_defeat_table_guards")
-            }
-            if settings.imperial_china_defeat_su_xi_san_xi
-                && scenario_progress.current == 521
-                && bosses_defeated.current == 2
-                && bosses_defeated.old < 2
-            {
-                split(splits, "imperial_china_defeat_su_xi_san_xi")
-            }
-            if settings.imperial_china_defeat_yi_xi_er_xi
-                && scenario_progress.current == 522
-                && bosses_defeated.current == 2
-                && bosses_defeated.old < 2
-            {
-                split(splits, "imperial_china_defeat_yi_xi_er_xi")
-            }
-            if settings.imperial_china_defeat_tong_cha_sha_cha
-                && scenario_progress.current == 523
-                && bosses_defeated.current == 2
-                && bosses_defeated.old < 2
-            {
-                split(splits, "imperial_china_defeat_tong_cha_sha_cha")
-            }
-            if settings.imperial_china_defeat_pei_cha_nan_cha
-                && scenario_progress.current == 524
-                && bosses_defeated.current == 2
-                && bosses_defeated.old < 2
-            {
-                split(splits, "imperial_china_defeat_pei_cha_nan_cha")
-            }
-            if settings.imperial_china_defeat_xian_lin_chan
-                && scenario_progress.current == 530
-                && bosses_defeated.current == 3
-                && bosses_defeated.old < 3
-            {
-                split(splits, "imperial_china_defeat_xian_lin_chan")
-            }
-            if settings.imperial_china_defeat_yi_pei_kou
-                && scenario_progress.current == 531
-                && duration_frames_value.changed_from_to(&0, &180)
-            {
-                split(splits, "imperial_china_defeat_yi_pei_kou")
-            }
-            if settings.imperial_china_defeat_ou_di_wan_li
-                && scenario_progress.current >= 532
-                && duration_frames_value.changed_from_to(&0, &360)
-            {
-                split(splits, "imperial_china_defeat_ou_di_wan_lee")
-            }
-            if settings.imperial_china_end_split
-                && scenario_progress.current == 650
-                && map_id.current.matches("None")
-                && transition_state.changed_from_to(&4, &0)
-            {
-                split(splits, "imperial_china_end_split")
-            }
-        }
+
+pub fn check_splits(
+    settings: &Settings,
+    splits: &mut HashSet<String>,
+    current_chapter: &Pair<i8>,
+    scenario_progress: &Pair<i32>,
+    map_id: &Pair<ArrayCString<64>>,
+    transition_state: &Pair<u32>,
+    bosses_defeated: &Pair<u32>,
+    duration_frames_value: &Pair<i32>,
+    battle_id: &Pair<i32>,
+    battle_result: u8
+) {
+    // Start Split
+    if current_chapter.old == Chapter::Menu as i8
+    {
+        split(splits, "start_imperial_china")
+    }
+    // Put Scenario Splits Here
+    //
+    if scenario_progress.old >= 50
+        && scenario_progress.old < 160
+        && scenario_progress.current == 160
+    {
+        split(splits, "imperial_china_recruit_all_diciples")
+    }
+    if scenario_progress.old >= 300
+        && scenario_progress.old < 320
+        && scenario_progress.current == 320
+    {
+        split(splits, "imperial_china_training_complete")
+    }
+    if scenario_progress.old >= 390
+        && scenario_progress.old < 400
+        && scenario_progress.current == 400
+    {
+        split(splits, "imperial_china_defeat_sun_tzu_wang")
+    }
+    if scenario_progress.old >= 470
+        && scenario_progress.old < 490
+        && scenario_progress.current == 490
+    {
+        split(splits, "imperial_china_defeat_temple_guards")
+    }
+    if scenario_progress.old >= 490
+        && scenario_progress.old < 495
+        && scenario_progress.current == 495
+    {
+        split(splits, "imperial_china_defeat_courtyard_guards")
+    }
+    if scenario_progress.old >= 510
+        && scenario_progress.old < 520
+        && scenario_progress.current == 520
+    {
+        split(splits, "imperial_china_defeat_table_guards")
+    }
+    if scenario_progress.current == 521
+        && bosses_defeated.current == 2
+        && bosses_defeated.old < 2
+    {
+        split(splits, "imperial_china_defeat_su_xi_san_xi")
+    }
+    if scenario_progress.current == 522
+        && bosses_defeated.current == 2
+        && bosses_defeated.old < 2
+    {
+        split(splits, "imperial_china_defeat_yi_xi_er_xi")
+    }
+    if scenario_progress.current == 523
+        && bosses_defeated.current == 2
+        && bosses_defeated.old < 2
+    {
+        split(splits, "imperial_china_defeat_tong_cha_sha_cha")
+    }
+    if scenario_progress.current == 524
+        && bosses_defeated.current == 2
+        && bosses_defeated.old < 2
+    {
+        split(splits, "imperial_china_defeat_pei_cha_nan_cha")
+    }
+    if scenario_progress.current == 530
+        && bosses_defeated.current == 3
+        && bosses_defeated.old < 3
+    {
+        split(splits, "imperial_china_defeat_xian_lin_chan")
+    }
+    if scenario_progress.current == 531
+        && duration_frames_value.changed_from_to(&0, &180)
+    {
+        split(splits, "imperial_china_defeat_yi_pei_kou")
+    }
+    if scenario_progress.current >= 532
+        && duration_frames_value.changed_from_to(&0, &360)
+    {
+        split(splits, "imperial_china_defeat_ou_di_wan_lee")
+    }
+    if scenario_progress.current == 650
+        && map_id.current.matches("None")
+        && transition_state.changed_from_to(&4, &0)
+    {
+        split(splits, "imperial_china_end_split")
     }
 }
