@@ -1,6 +1,6 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::Add};
 
-use asr::{Address, Process, game_engine::unreal::FNameKey, watcher::{Pair, Watcher}, timer};
+use asr::{Address, PointerSize::Bit64, Process, game_engine::unreal::FNameKey, timer, watcher::{Pair, Watcher}};
 
 
 
@@ -20,41 +20,30 @@ pub fn split(splits: &mut HashSet<String>, key: &str) {
 
 pub struct ChapterData {
     pub character_data: Vec<CharacterData>,
-    pub map_key: GamePointer<FNameKey>,
 }
 
 impl ChapterData {
-    pub fn update(&mut self, process: &Process, module_base: Address) {
-        self.update_character_data(process, module_base);
+    pub fn update(&mut self, process: &Process, chapter_data_base: Address) {
+        self.update_character_data(process, chapter_data_base);
     }
 
-    pub fn update_character_data(&mut self, process: &Process, module_base: Address) {
+    pub fn update_character_data(&mut self, process: &Process, chapter_data_base: Address) {
         let mut character_data: Vec<CharacterData> = vec![];
 
-        let count_addr = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x158];
+        let count : u32 = process.read(chapter_data_base + 0x8).unwrap_or_default();
 
-        let count: Option<u8> =
-            match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &count_addr) {
-                Ok(val) => Some(val),
-                Err(_e) => Some(0),
-            };
+        if count == 0 { return; }
+
+        let base_addr = process.read_pointer(chapter_data_base,Bit64).unwrap_or(Address::NULL);
 
         const SIZE: u64 = 0xB0;
 
-        for x in 0..count.unwrap() {
+        for x in 0..count {
             let offset: u64 = (x as u64) * SIZE;
-            let mut data_addr: Vec<u64> = vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x150];
 
-            data_addr.push(offset);
-
-            let character_data_struct: Option<CharacterData> =
-                match process.read_pointer_path(module_base, asr::PointerSize::Bit64, &data_addr) {
-                    Ok(val) => Some(val),
-                    Err(_e) => None,
-                };
-            if let Some(val) = character_data_struct {
-                character_data.push(val);
-            }
+            if let Ok(character_data_struct) = process.read::<CharacterData>(base_addr + offset) {
+                character_data.push(character_data_struct);
+            };
         }
         self.character_data = character_data;
     }
@@ -64,7 +53,7 @@ impl ChapterData {
 #[repr(C)]
 pub struct CharacterData {
     pub _tag_name: FNameKey, //FName.ComparisonIndex
-    _tag_suffix: u32, //FName.Number - probably not used here but we need it to match the memory layout 
+    _tag_suffix: u32, //FName.Number - probably useless here but we need to pad to match the memory layout anyway 
     pub level: u32,
     max_hp: u32,
     physical_attack: u32,

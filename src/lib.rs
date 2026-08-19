@@ -56,17 +56,21 @@ async fn main() {
                 //let titles_skippable = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","WB_StartUp","SkipFlag"]);
                 //let battle_end_event_field_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","bFireEventFromBattleEnd"]);
                 let map_key_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","FieldManager","CurrentMapTag"]); //read to - FNameKey
-                let loading_alt_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","FieldManager","bIsWaitingLoadingScreen"]); //read to - bool
+                //let loading_alt_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","FieldManager","bIsWaitingLoadingScreen"]); //read to - bool
                 //let game_mode_state = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","RICStateManager","<idk where the current state is, maybe in UnknownData_LFXP>"]);
 
                 //note that ChapterData is a struct, not a class, so we have to deref_offset to it and then add a manual offset over that to get anything from the class
                 //let game_instance = process.read_pointer(main_module_base + 0x4A2DA88, asr::PointerSize::Bit64).unwrap_or(Address::NULL) + 0x20;
                 let chapter_data_ptr = UnrealPointer::<4>::new(g_engine,&["GameInstance","SaveGameManager","RICSaveGamePlay","TemporaryPlayingChapterData"]);  //read to - pointer (deref_offsets)
                 let chapter_ptr = UnrealPointer::<4>::new(g_engine,&["GameInstance","SaveGameManager","RICSaveGamePlay","CurrentGameChapterID"]);  //read to - u8/Chapter
-                let scenario_progress_ptr = UnrealPointer::<4>::new(g_engine,&["GameInstance","SaveGameManager","RICSaveGamePlay","ScenarioProgress"]); //read to - i32
 
                 //let transition_state_ptr = UnrealPointer::<3>::new(game_instance,&["LocalPlayers","_data","CurrentGameChapterID","ViewportClient","<IDK this shows up as UnknownData_F28S[0xC]>"]);  //read to - u8/Chapter
 
+                //some random encounter data for routing purposes, we don't actually read these in release builds, only in debug builds
+                let steps_to_start_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterProcessStart"]);
+                let steps_to_judge_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterJudgement"]);
+                let travel_distance_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","TravelDistance"]);
+                let encounter_rate_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","EncounterRate"]);
 
                 //let test_ptr = UnrealPointer::<8>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","GameResult"]);
                 // Managers
@@ -83,7 +87,7 @@ async fn main() {
                     GamePointer::<u8>::new(main_module_base, vec![0x508ACE0, 0x10, 0xB0, 0xE0, 0x348]);
                 /*let mut scenario_progress_pointer =
                     GamePointer::<u16>::new(main_module_base, vec![0x4A2DA88, 0x20, 0x1B8, 0x110, 0x1C0]);*/
-                let mut loading_pointer = GamePointer::<u8>::new(
+                let mut loading_done_pointer = GamePointer::<u8>::new(
                     main_module_base,
                     vec![0x5092A98, 0x8, 0x10, 0x50, 0x30, 0x3FA],
                 );
@@ -93,11 +97,7 @@ async fn main() {
                 );
 
                 let mut chapter_data = ChapterData {
-                    character_data: vec![],
-                    map_key: GamePointer::<FNameKey>::new(
-                        main_module_base,
-                        vec![0x4A2DA88, 0x20, 0x20, 0x780, 0x78, 0x118, 0x378, 0x418],
-                    ),
+                    character_data: vec![]
                 };
 
                 // Frame number value for Sin Odio fight.
@@ -118,7 +118,7 @@ async fn main() {
                 let mut frame_number_watcher = Watcher::<i32>::new();
                 let mut frame_duration_watcher = Watcher::<i32>::new();
                 let mut scenario_progress_watcher = Watcher::<i32>::new();
-                let mut loading_watcher = Watcher::<bool>::new();
+                //let mut loading_watcher = Watcher::<bool>::new();
                 //let mut map_key_watcher = Watcher::<FNameKey>::new();
                 let mut map_name_watcher = Watcher::<ArrayCString<64>>::new();
                 let mut encounter_watcher = Watcher::<i32>::new();
@@ -140,14 +140,14 @@ async fn main() {
 
                     let chapter_data_addr = chapter_data_ptr.deref_offsets(&process, &module).unwrap_or(Address::NULL);
 
-                    let loading = loading_pointer.update_value(&process);
+                    let loading = loading_done_pointer.update_value(&process);
                     let chapter = chapter_watcher.update_infallible(chapter_ptr.deref(&process, &module).unwrap_or(-1)); //chapter_pointer.update_value(&process);
                     let new_game_start = new_game_start_pointer.update_value(&process);
                     let scenario_progress = scenario_progress_watcher.update_infallible(process.read(chapter_data_addr+0x70).unwrap_or_default()); //scenario_progress_pointer.update_value(&process);
                     //let map_key = chapter_data.map_key.update_value(&process);
                     let map_name = map_name_watcher.update_infallible(module.get_fname(&process, map_key_ptr.deref(&process, &module).unwrap_or(FNameKey::zeroed())).unwrap_or_default());
 
-                    let loading_alt = loading_watcher.update_infallible(loading_alt_ptr.deref(&process,&module).unwrap_or_default());
+                    //let loading_alt = loading_watcher.update_infallible(loading_alt_ptr.deref(&process,&module).unwrap_or_default());
 
 
                     //let last_battle_name = module.get_fname::<256>(&process, last_battle_ptr.deref::<FNameKey>(&process, &module).unwrap_or(FNameKey::zeroed())).unwrap_or_default();
@@ -165,7 +165,7 @@ async fn main() {
                     //Testing ScriptVariables
                     //NOTE FOR TOMORROW: The keys are FStrings (=TArray of UTF16 chars) not FGameplayTags/FNames!
                     'blk: {
-                        if chapter.current != Chapter::DominionOfHate as i8 {break 'blk;} //for some reason labeled blocks can't have an if
+                        //if chapter.current != Chapter::DominionOfHate as i8 {break 'blk;} //for some reason labeled blocks can't have an if
                         //let start = Instant::now();
                         //let mut IntVariables: std::collections::HashMap<String, i32> = std::collections::HashMap::<String,i32>::new();
                         static INTVAR_SIZE : i32 = 0x20; //8 bytes (pointer), 2*4=8 bytes (count+max), 4 bytes (int), 2*4=8 bytes (hash stuff), IDK where last 4 bytes from
@@ -210,7 +210,7 @@ async fn main() {
                     let recruit_count = recruit_watcher.pair.unwrap();
                         
 
-                    chapter_data.update(&process, main_module_base);
+                    chapter_data.update(&process, chapter_data_addr);
 
                     if chapter.current == Chapter::ImperialChina as i8 {
                         if scenario_progress.current >= 521
@@ -285,6 +285,10 @@ async fn main() {
                     {
                         #![cfg(debug_assertions)]
                         //info that should be kept internal
+                        timer::set_variable_int("Travel Distance",travel_distance_ptr.deref::<i32>(&process,&module).unwrap_or_default());
+                        timer::set_variable_int("To Encounter Process Start",steps_to_start_ptr.deref::<i32>(&process,&module).unwrap_or_default());
+                        timer::set_variable_int("To Encounter Judge",steps_to_judge_ptr.deref::<i32>(&process,&module).unwrap_or_default());
+                        timer::set_variable_int("Encounter Rate",encounter_rate_ptr.deref::<i32>(&process,&module).unwrap_or_default());
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
                         timer::set_variable_int("Transition State", transition_state.current);
                         //timer::set_variable("Loading (Alt)", &loading_alt.current.to_string());
