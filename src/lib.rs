@@ -58,6 +58,7 @@ async fn main() {
                 let map_key_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","FieldManager","CurrentMapTag"]); //read to - FNameKey
                 //let loading_alt_ptr = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","FieldManager","bIsWaitingLoadingScreen"]); //read to - bool
                 //let game_mode_state = UnrealPointer::<3>::new(g_world,&["AuthorityGameMode","RICStateManager","<idk where the current state is, maybe in UnknownData_LFXP>"]);
+                let last_flowprocessor_ptr = UnrealPointer::<5>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","BattleFacilitator","LastBattleFlowProcessor"]);
 
                 //note that ChapterData is a struct, not a class, so we have to deref_offset to it and then add a manual offset over that to get anything from the class
                 //let game_instance = process.read_pointer(main_module_base + 0x4A2DA88, asr::PointerSize::Bit64).unwrap_or(Address::NULL) + 0x20;
@@ -121,6 +122,7 @@ async fn main() {
                 let mut chapter_watcher = Watcher::<i8>::new();
                 let mut frame_number_watcher = Watcher::<i32>::new();
                 let mut frame_duration_watcher = Watcher::<i32>::new();
+                let mut battle_processor_watcher = Watcher::<ArrayCString<48>>::new();
                 let mut scenario_progress_watcher = Watcher::<i32>::new();
                 //let mut loading_watcher = Watcher::<bool>::new();
                 //let mut map_key_watcher = Watcher::<FNameKey>::new();
@@ -133,6 +135,9 @@ async fn main() {
                 let mut recruit_watcher = Watcher::<i32>::new();
                 escape_watcher.update_infallible(0); //initializing the internal pair
                 recruit_watcher.update_infallible(0); //initializing the internal pair
+
+                //asr::print_message(module.get_fname::<64>(&process,process.read_pointer_path(last_flowprocessor_ptr.deref::<u64>(&process,&module).unwrap_or_default(),Bit64,&[0x18]).unwrap_or(FNameKey::zeroed())).unwrap_or_default().validate_utf8().unwrap_or_default());
+                //asr::print_message(&format!("{}",last_flowprocessor_ptr.deref_offsets(&process,&module).unwrap_or(Address::NULL)));
 
 
                 
@@ -165,6 +170,7 @@ async fn main() {
 
                     let frame_index = frame_number_watcher.update_infallible(level_sequence_position_ptr.deref(&process, &module).unwrap_or_default()); //frame_number_pointer.update_value(&process);
                     let duration_frames = frame_duration_watcher.update_infallible(level_sequence_duration_ptr.deref(&process, &module).unwrap_or_default()); //duration_frames_pointer.update_value(&process);
+                    let last_flowprocessor = battle_processor_watcher.update_infallible(module.get_fname::<48>(&process,process.read::<FNameKey>(last_flowprocessor_ptr.deref::<u64>(&process,&module).unwrap_or_default()+0x18).unwrap_or(FNameKey::zeroed())).unwrap_or_default());
 
                     //Testing ScriptVariables
                     //NOTE FOR TOMORROW: The keys are FStrings (=TArray of UTF16 chars) not FGameplayTags/FNames!
@@ -309,6 +315,7 @@ async fn main() {
                         //timer::set_variable("Loading (Alt)", &loading_alt.current.to_string());
                         timer::set_variable_int("FPV", frame_index.current);
                         timer::set_variable_int("DF", duration_frames.current);
+                        timer::set_variable("Battle Flow Processor",last_flowprocessor.current.validate_utf8().unwrap_or_default());
                         timer::set_variable_int("Current Battle", battle_id.current);
                         timer::set_variable_int("New Game Check", new_game_start.current);
                         timer::set_variable_int("Counted boss vanishes", bosses_defeated.current);
@@ -390,9 +397,9 @@ async fn main() {
                                 &scenario_progress,
                                 map_name,
                                 &transition_state,
-                                &bosses_defeated,
                                 &duration_frames,
                                 battle_id,
+                                last_flowprocessor,
                                 battle_result,
                             ),
                         4 => scenario_progress::wild_west::check_splits(
@@ -451,6 +458,7 @@ async fn main() {
                                 frame_index,
                                 duration_frames,
                                 battle_id,
+                                last_flowprocessor,
                                 battle_result,
                             ),
                         _ => ()

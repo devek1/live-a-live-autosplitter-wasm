@@ -14,9 +14,9 @@ pub fn check_splits(
     scenario_progress: &Pair<i32>,
     map_id: &Pair<ArrayCString<64>>,
     transition_state: &Pair<u32>,
-    bosses_defeated: &Pair<u32>,
     duration_frames_value: &Pair<i32>,
     battle_id: &Pair<i32>,
+    battle_last_flowprocessor: &Pair<ArrayCString<48>>,
     battle_result: u8
 ) {
     // Start Split
@@ -62,33 +62,37 @@ pub fn check_splits(
     {
         split(splits, "imperial_china_defeat_table_guards")
     }
-    if scenario_progress.current == 521
-        && bosses_defeated.current == 2
-        && bosses_defeated.old < 2
+    if battle_id.current == 319
+        && battle_last_flowprocessor.bytes_changed()
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_su_xi_san_xi")
     }
     if scenario_progress.current == 522
-        && bosses_defeated.current == 2
-        && bosses_defeated.old < 2
+        && battle_last_flowprocessor.bytes_changed()
+        && duration_frames_value.current != 200
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_yi_xi_er_xi")
     }
     if scenario_progress.current == 523
-        && bosses_defeated.current == 2
-        && bosses_defeated.old < 2
+        && battle_last_flowprocessor.bytes_changed()
+        && duration_frames_value.current != 200
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_tong_cha_sha_cha")
     }
     if scenario_progress.current == 524
-        && bosses_defeated.current == 2
-        && bosses_defeated.old < 2
+        && battle_last_flowprocessor.bytes_changed()
+        && duration_frames_value.current != 200
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_pei_cha_nan_cha")
     }
     if scenario_progress.current == 530
-        && bosses_defeated.current == 3
-        && bosses_defeated.old < 3
+        && battle_last_flowprocessor.bytes_changed()
+        && duration_frames_value.current != 200
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_xian_lin_chan")
     }

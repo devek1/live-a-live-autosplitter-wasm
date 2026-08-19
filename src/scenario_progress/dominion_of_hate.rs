@@ -18,6 +18,7 @@ pub fn check_splits(
     frame_pointer_value: &Pair<i32>,
     duration_frames_value: &Pair<i32>,
     battle_id: &Pair<i32>,
+    battle_last_flowprocessor: &Pair<ArrayCString<48>>,
     battle_result: u8
 ) {
     // Start Split
@@ -36,7 +37,9 @@ pub fn check_splits(
     {
         split(splits, "dominion_enter_roost")
     }
-    if bosses_defeated.changed_from_to(&3, &4) 
+    if battle_last_flowprocessor.bytes_changed()
+        && duration_frames_value.current != 200
+        && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_08Last") 
     {
         split(splits, match battle_id.current {
             884 => "dominion_pure_odio_skip",
