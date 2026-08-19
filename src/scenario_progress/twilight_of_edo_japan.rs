@@ -54,11 +54,7 @@ pub fn check_splits(
     if map_id.old.matches("id.map.07bakuma.050kura.03")
         && map_id.current.matches("id.map.07bakuma.000odecastle.01")
         && chapter_data
-            .character_data
-            .clone()
-            .into_iter()
-            .nth(0)
-            .unwrap()
+            .character_data[0]
             .level
             == 6
     {

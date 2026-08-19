@@ -67,10 +67,14 @@ async fn main() {
                 //let transition_state_ptr = UnrealPointer::<3>::new(game_instance,&["LocalPlayers","_data","CurrentGameChapterID","ViewportClient","<IDK this shows up as UnknownData_F28S[0xC]>"]);  //read to - u8/Chapter
 
                 //some random encounter data for routing purposes, we don't actually read these in release builds, only in debug builds
-                let steps_to_start_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterProcessStart"]);
-                let steps_to_judge_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterJudgement"]);
-                let travel_distance_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","TravelDistance"]);
-                let encounter_rate_ptr = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","EncounterRate"]);
+                let steps_to_start_ptr1 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterProcessStart"]);
+                let steps_to_judge_ptr1 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","DistanceToEncounterJudgement"]);
+                let travel_distance_ptr1 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","TravelDistance"]);
+                let encounter_rate_ptr1 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener","EncounterRate"]);
+                let steps_to_start_ptr2 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener_08Last","DistanceToEncounterProcessStart"]);
+                let steps_to_judge_ptr2 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener_08Last","DistanceToEncounterJudgement"]);
+                let travel_distance_ptr2 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener_08Last","TravelDistance"]);
+                let encounter_rate_ptr2 = UnrealPointer::<4>::new(g_world,&["AuthorityGameMode","FieldManager","BPC_RandomEncounterListener_08Last","EncounterRate"]);
 
                 //let test_ptr = UnrealPointer::<8>::new(g_world,&["AuthorityGameMode","BattleManager","CurrentBattleWorld","GameResult"]);
                 // Managers
@@ -285,10 +289,21 @@ async fn main() {
                     {
                         #![cfg(debug_assertions)]
                         //info that should be kept internal
-                        timer::set_variable_int("Travel Distance",travel_distance_ptr.deref::<i32>(&process,&module).unwrap_or_default());
-                        timer::set_variable_int("To Encounter Process Start",steps_to_start_ptr.deref::<i32>(&process,&module).unwrap_or_default());
-                        timer::set_variable_int("To Encounter Judge",steps_to_judge_ptr.deref::<i32>(&process,&module).unwrap_or_default());
-                        timer::set_variable_int("Encounter Rate",encounter_rate_ptr.deref::<i32>(&process,&module).unwrap_or_default());
+                        match chapter.current {
+                            0 => {
+                                timer::set_variable_int("Travel Distance",travel_distance_ptr1.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("To Encounter Process Start",steps_to_start_ptr1.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("To Encounter Judge",steps_to_judge_ptr1.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("Encounter Rate",encounter_rate_ptr1.deref::<i32>(&process,&module).unwrap_or_default());
+                            }
+                            8 => {
+                                timer::set_variable_int("Travel Distance",travel_distance_ptr2.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("To Encounter Process Start",steps_to_start_ptr2.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("To Encounter Judge",steps_to_judge_ptr2.deref::<i32>(&process,&module).unwrap_or_default());
+                                timer::set_variable_int("Encounter Rate",encounter_rate_ptr2.deref::<i32>(&process,&module).unwrap_or_default());
+                            }
+                            _ => ()
+                        };
                         timer::set_variable_int("Scenario Progress", scenario_progress.current);
                         timer::set_variable_int("Transition State", transition_state.current);
                         //timer::set_variable("Loading (Alt)", &loading_alt.current.to_string());
