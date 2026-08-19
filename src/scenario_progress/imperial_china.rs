@@ -68,40 +68,40 @@ pub fn check_splits(
     {
         split(splits, "imperial_china_defeat_su_xi_san_xi")
     }
-    if scenario_progress.current == 522
+    if battle_id.current == 320
         && battle_last_flowprocessor.bytes_changed()
         && duration_frames_value.current != 200
         && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_yi_xi_er_xi")
     }
-    if scenario_progress.current == 523
+    if battle_id.current == 321
         && battle_last_flowprocessor.bytes_changed()
         && duration_frames_value.current != 200
         && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_tong_cha_sha_cha")
     }
-    if scenario_progress.current == 524
+    if battle_id.current == 322
         && battle_last_flowprocessor.bytes_changed()
         && duration_frames_value.current != 200
         && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_pei_cha_nan_cha")
     }
-    if scenario_progress.current == 530
+    if battle_id.current == 323
         && battle_last_flowprocessor.bytes_changed()
         && duration_frames_value.current != 200
         && battle_last_flowprocessor.current.matches("BP_BtlProcessor_BattleEnd_03Kunfu")
     {
         split(splits, "imperial_china_defeat_xian_lin_chan")
     }
-    if scenario_progress.current == 531
+    if battle_id.current == 324
         && duration_frames_value.changed_from_to(&0, &180)
     {
         split(splits, "imperial_china_defeat_yi_pei_kou")
     }
-    if scenario_progress.current >= 532
+    if battle_id.current == 325
         && duration_frames_value.changed_from_to(&0, &360)
     {
         split(splits, "imperial_china_defeat_ou_di_wan_lee")
